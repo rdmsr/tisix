@@ -3,10 +3,10 @@
 **Tisix** is an operating system written in C++17 (I try not to overuse it though).
 
 ## Features
-- tiny microkernel (~2k LoC)
-- rich and modern C++ freestanding library
-- portable codebase (In the architecture way)
-- permissive license
+- Tiny microkernel (~2k LoC).
+- Rich and modern C++ freestanding library.
+- Portable codebase (In the architecture way).
+- Permissive license.
 
 ## Why C++?
 C was becoming limiting in terms of metaprogramming and namespaces. In this repo, I try not to overuse C++ features such as templates and stuff that make code totally unreadable
