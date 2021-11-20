@@ -17,7 +17,6 @@ C was becoming limiting in terms of metaprogramming and namespaces. In this repo
 3. Microkernels > *, btw
 
 ## Current issues with the codebase
-- The `Arch` API thingy makes me lose my sanity.
 - No SMP
 - The scheduling algorithm could be greatly improved, its time_slice thing seems broken.
 - The `servers`'s build system could also be improved.
