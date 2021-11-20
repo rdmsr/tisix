@@ -108,7 +108,7 @@ auto fmt_make_storage(T... t)
     return FmtStorage<sizeof...(T)>{.values = {fmt_match(t)...}};
 }
 
-void fmt_stream_impl(Stream<const char *> *stream, StringView fmt, FmtArgs args);
+void fmt_stream_impl(void (*callback)(const char *s), StringView fmt, FmtArgs args);
 
 #define fmt_stream(stream, fmt, ...) \
     fmt_stream_impl(stream, fmt, tisix::fmt_make_storage(__VA_ARGS__).args);

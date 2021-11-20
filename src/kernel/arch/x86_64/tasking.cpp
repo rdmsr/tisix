@@ -7,7 +7,7 @@
 
 using namespace tisix;
 
-Task::Task(Vmm &vmm, StringView name, uint8_t m_flags)
+Task::Task(StringView name, uint8_t m_flags)
 {
     this->name = name;
     this->flags = m_flags;
@@ -18,9 +18,9 @@ Task::Task(Vmm &vmm, StringView name, uint8_t m_flags)
 
     if (flags & TX_USER)
     {
-        this->pagemap = (uint64_t *)((uint64_t)get_arch()->allocator->allocate(1).value + MMAP_KERNEL_BASE);
+        this->pagemap = (uint64_t *)((uint64_t)host_allocate_pages(1) + MMAP_KERNEL_BASE);
 
-        auto n_pmap = (uint64_t *)((uint64_t)get_arch()->kernel_pagemap + MMAP_KERNEL_BASE);
+        auto n_pmap = (uint64_t *)((uint64_t)vmm_get_kernel_pagemap() + MMAP_KERNEL_BASE);
 
         for (auto i = 256; i < 512; i++)
         {
@@ -33,7 +33,7 @@ Task::Task(Vmm &vmm, StringView name, uint8_t m_flags)
             auto phys_addr = i * PAGE_SIZE + ALIGN_DOWN((stack - MMAP_IO_BASE), PAGE_SIZE);
             auto virt_addr = i * PAGE_SIZE + ALIGN_DOWN((USER_STACK_BASE - KERNEL_STACK_SIZE), PAGE_SIZE);
 
-            vmm.map_page(pagemap, phys_addr, virt_addr, 0b111);
+            host_map_memory(pagemap, phys_addr, virt_addr, 0b111);
         }
     }
 }
@@ -60,7 +60,7 @@ void Task::start(uintptr_t ip)
     {
         regs.cs = 0x8;
         regs.ss = 0x10;
-        pagemap = get_arch()->kernel_pagemap;
+        pagemap = vmm_get_kernel_pagemap();
     }
 
     this->stack = regs;

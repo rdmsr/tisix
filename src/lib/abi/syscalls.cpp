@@ -9,10 +9,10 @@ extern "C" TxResult tx_sys_debug(const char *args)
 extern "C" TxResult tx_syscall(TxSyscall syscall, void *arg)
 {
     uint64_t res = 0;
-
+    (void)res;
 #ifdef __x86_64__
     asm volatile("int $0x42"
-                 : "=a"(res)
+                 :
                  : "a"((int)syscall), "b"(arg));
 #endif
 

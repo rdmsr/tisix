@@ -33,13 +33,12 @@ extern uint8_t stack[KERNEL_STACK_SIZE];
 
 void arch_entry_main(Handover *handover)
 {
-    COM com(COM1);
-
-    get_arch()->debug_stream = &com;
+    com_initialize(COM1);
 
     splash();
 
     gdt_initialize(stack);
+
     idt_initialize();
 
     pic_initialize();
@@ -50,21 +49,17 @@ void arch_entry_main(Handover *handover)
 
     apic_initialize(&acpi);
 
-    Pmm pmm(handover);
+    pmm_initialize(handover);
 
-    pmm.dump();
-
-    get_arch()->allocator = &pmm;
+    pmm_dump(handover);
 
     asm_cli();
 
-    Vmm vmm(&pmm, handover);
+    vmm_initialize(handover);
 
     asm_sti();
 
-    get_arch()->kernel_pagemap = vmm.get_kernel_pagemap();
-
-    log("usable pages: {} ({} mb)", pmm.usable_pages, (pmm.usable_pages * PAGE_SIZE) / 1024 / 1024);
+    log("usable pages: {} ({} mb)", pmm_get_usable_pages(), (pmm_get_usable_pages() * PAGE_SIZE) / 1024 / 1024);
 
     log("Modules:");
     for (size_t i = 0; i < handover->modules.size; i++)
@@ -75,7 +70,7 @@ void arch_entry_main(Handover *handover)
     }
 
     loader_init();
-    loader_new_elf_task(handover->modules, "echo", TX_USER, vmm);
+    loader_new_elf_task(handover->modules, "echo", TX_USER);
 
     while (1)
         ;

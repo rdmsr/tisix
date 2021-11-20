@@ -2,6 +2,8 @@
 
 #include <tisix/stream.hpp>
 
+namespace tisix
+{
 typedef enum
 {
     COM1 = 0x3F8,
@@ -10,14 +12,7 @@ typedef enum
     COM4 = 0x2E8
 } ComPort;
 
-class COM : public tisix::Stream<const char *>
-{
-public:
-    void write(const char *s) override;
-    const char *read() override;
-    COM(ComPort p);
-    void putc(char c) override;
-
-private:
-    ComPort port;
-};
+void com_initialize(ComPort port);
+void com_write(ComPort port, const char *string);
+void com_putc(ComPort port, char c);
+} // namespace tisix

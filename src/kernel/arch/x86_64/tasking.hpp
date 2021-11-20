@@ -19,7 +19,7 @@ struct Task
 
     tisix::StringView name;
 
-    Task(Vmm &vmm, tisix::StringView name, uint8_t flags);
+    Task(tisix::StringView name, uint8_t flags);
 
     void start(uintptr_t ip);
 

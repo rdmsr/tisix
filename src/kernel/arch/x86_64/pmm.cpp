@@ -1,12 +1,20 @@
 #include "pmm.hpp"
 #include "tisix/arch.hpp"
+#include "tisix/bitmap.hpp"
 #include "tisix/handover.hpp"
 #include "tisix/mem.hpp"
 #include <tisix/assert.hpp>
+#include <tisix/host.hpp>
 
 using namespace tisix;
 
-Maybe<size_t> Pmm::get_bitmap_size()
+static Bitmap bitmap;
+static uintptr_t usable_pages = 0;
+static uintptr_t highest_page = 0;
+
+uint64_t pmm_get_usable_pages() { return usable_pages; };
+
+static Maybe<size_t> get_bitmap_size(Handover *handover)
 {
     uintptr_t top = 0;
 
@@ -35,13 +43,10 @@ Maybe<size_t> Pmm::get_bitmap_size()
     return Nothing;
 }
 
-Pmm::Pmm(Handover *_handover)
+void pmm_initialize(Handover *handover)
 {
-    this->handover = _handover;
 
-    this->highest_page = 0;
-
-    auto bitmap_size = get_bitmap_size().value_or(panic_to_lambda("Could not get bitmap size"));
+    auto bitmap_size = get_bitmap_size(handover).value_or(panic_to_lambda("Could not get bitmap size"));
 
     for (size_t i = 0; i < handover->mmap.size; i++)
     {
@@ -51,7 +56,7 @@ Pmm::Pmm(Handover *_handover)
         {
             log("Allocated memory bitmap at {#x}-{#x}", e->base, e->base + bitmap_size - 1);
 
-            this->bitmap = Bitmap{(uint8_t *)(e->base + MMAP_IO_BASE), bitmap_size};
+            bitmap = Bitmap{(uint8_t *)(e->base + MMAP_IO_BASE), bitmap_size};
 
             e->base += bitmap_size;
             e->size -= bitmap_size;
@@ -60,7 +65,7 @@ Pmm::Pmm(Handover *_handover)
         }
     }
 
-    this->bitmap.fill(0xff);
+    bitmap.fill(0xff);
 
     log("bitmap is {} kib long", bitmap_size / 1024);
 
@@ -68,19 +73,19 @@ Pmm::Pmm(Handover *_handover)
     {
         if (entry.type == HANDOVER_MMAP_FREE)
         {
-            this->free((void *)entry.base, entry.size / PAGE_SIZE);
+            pmm_free((void *)entry.base, entry.size / PAGE_SIZE);
         }
     }
 }
 
-void Pmm::set_page(void *addr)
+static void set_page(void *addr)
 {
 
     bitmap.set((size_t)addr / PAGE_SIZE);
     usable_pages--;
 }
 
-void Pmm::set_pages(void *addr, size_t page_count)
+static void set_pages(void *addr, size_t page_count)
 {
     for (size_t i = 0; i < page_count; i++)
     {
@@ -88,14 +93,14 @@ void Pmm::set_pages(void *addr, size_t page_count)
     }
 }
 
-void Pmm::clear_page(void *addr)
+static void clear_page(void *addr)
 {
 
     bitmap.clear((size_t)addr / PAGE_SIZE);
     usable_pages++;
 }
 
-void Pmm::free(void *addr, size_t pages)
+void pmm_free(void *addr, size_t pages)
 {
     for (size_t i = 0; i < pages; i++)
     {
@@ -103,7 +108,7 @@ void Pmm::free(void *addr, size_t pages)
     }
 }
 
-Maybe<void *> Pmm::allocate(size_t pages)
+Maybe<void *> pmm_allocate(size_t pages)
 {
     assert(pages > 0);
     assert(usable_pages > 0);
@@ -132,9 +137,9 @@ Maybe<void *> Pmm::allocate(size_t pages)
     return Nothing;
 }
 
-Maybe<void *> Pmm::allocate_zero(size_t pages)
+Maybe<void *> pmm_allocate_zero(size_t pages)
 {
-    void *ret = this->allocate(pages).value_or(panic_to_lambda("Failed allocating memory"));
+    void *ret = pmm_allocate(pages).value_or(panic_to_lambda("Failed allocating memory"));
 
     memset((void *)((uintptr_t)ret + MMAP_IO_BASE), 0, pages * PAGE_SIZE);
 
@@ -160,7 +165,7 @@ static const char *get_memmap_entry_type(int type)
     }
 }
 
-void Pmm::dump()
+void pmm_dump(Handover *handover)
 {
     log("Loading mmap");
 
@@ -170,13 +175,13 @@ void Pmm::dump()
     }
 }
 
-void Pmm::print_bitmap(Stream<const char *> *stream, int n)
+void pmm_print_bitmap(int n)
 {
     if (n == 0)
     {
         for (size_t i = 0; i < bitmap.size; i++)
         {
-            fmt_stream(stream, "{}", (int)bitmap[i]);
+            fmt_stream(host_log_write, "{}", (int)bitmap[i]);
         }
     }
 
@@ -184,7 +189,7 @@ void Pmm::print_bitmap(Stream<const char *> *stream, int n)
     {
         for (int i = 0; i < n; i++)
         {
-            fmt_stream(stream, "{}", (int)bitmap[i]);
+            fmt_stream(host_log_write, "{}", (int)bitmap[i]);
         }
     }
 }

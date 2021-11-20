@@ -10,31 +10,15 @@
 #define MMAP_IO_BASE ((uintptr_t)0xffff800000000000)
 #define MMAP_KERNEL_BASE ((uintptr_t)0xffffffff80000000)
 
-class Pmm : public MemoryAllocator
-{
-public:
-    tisix::Maybe<void *> allocate(size_t pages) override;
+tisix::Maybe<void *> pmm_allocate(size_t pages);
+tisix::Maybe<void *> pmm_allocate_zero(size_t pages);
 
-    tisix::Maybe<void *> allocate_zero(size_t pages) override;
+void pmm_free(void *addr, size_t pages);
 
-    void free(void *addr, size_t pages) override;
+void pmm_initialize(tisix::Handover *handover);
 
-    Pmm(tisix::Handover *handover);
+void pmm_dump(tisix::Handover *handover);
 
-    void print_bitmap(tisix::Stream<const char *> *stream, int n = 0);
+void pmm_print_bitmap(int n = 10);
 
-    void dump();
-
-    size_t usable_pages = 0;
-
-private:
-    tisix::Bitmap bitmap;
-    tisix::Handover *handover;
-    uintptr_t highest_page;
-
-    tisix::Maybe<size_t> get_bitmap_size();
-
-    void set_page(void *addr);
-    void set_pages(void *addr, size_t pages);
-    void clear_page(void *addr);
-};
+uint64_t pmm_get_usable_pages();

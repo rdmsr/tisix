@@ -9,6 +9,6 @@ void splash()
     log("  |   |  _|   |_|__     |_|   |_|-     -|");
     log(" |___| |_______|_______|_______|___|___|");
     log("Compiled on {} at {}", __DATE__, __TIME__);
-    log("Booting on {}", get_arch()->name);
+    log("Booting on {}", get_arch_name());
     log("------------------------------------------");
 }

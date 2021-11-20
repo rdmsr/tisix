@@ -4,7 +4,7 @@
 
 using namespace tisix;
 
-using os = Stream<const char *> *;
+using os = void (*)(const char *s);
 
 void fmt_print_value(os output, FmtValue v, int base = 10, size_t pad = 0)
 {
@@ -13,12 +13,12 @@ void fmt_print_value(os output, FmtValue v, int base = 10, size_t pad = 0)
 
     case FMT_STRING:
     {
-        output->write(v.string.buffer);
+        output(v.string.buffer);
         break;
     }
     case FMT_BOOL:
     {
-        output->write(v._bool ? "#t" : "#f");
+        output(v._bool ? "#t" : "#f");
         break;
     }
 
@@ -27,17 +27,20 @@ void fmt_print_value(os output, FmtValue v, int base = 10, size_t pad = 0)
         char buf[50];
 
         if (base == 16)
-            output->write("0x");
+            output("0x");
 
         itoa(v._signed, buf, base);
 
         if (StringView(buf).size < pad)
         {
             for (size_t i = 0; i < pad - StringView(buf).size; i++)
-                output->putc('0');
+            {
+                char s[] = {'0', 0};
+                output(s);
+            }
         }
 
-        output->write(buf);
+        output(buf);
         break;
     }
 
@@ -47,17 +50,20 @@ void fmt_print_value(os output, FmtValue v, int base = 10, size_t pad = 0)
         char buf[50];
 
         if (base == 16)
-            output->write("0x");
+            output("0x");
 
         itoa(v._unsigned, buf, base);
 
         if (StringView(buf).size < pad)
         {
             for (size_t i = 0; i < pad - StringView(buf).size; i++)
-                output->putc('0');
+            {
+                char s[] = {'0', 0};
+                output(s);
+            }
         }
 
-        output->write(buf);
+        output(buf);
         break;
     }
 
@@ -65,15 +71,17 @@ void fmt_print_value(os output, FmtValue v, int base = 10, size_t pad = 0)
     {
         char buf[50];
 
-        output->write("0x");
+        output("0x");
 
-        output->write(itoa((uintptr_t)v.ptr, buf, 16));
+        output(itoa((uintptr_t)v.ptr, buf, 16));
         break;
     }
 
     case FMT_CHAR:
     {
-        output->putc(v._char);
+
+        char s[] = {v._char, 0};
+        output(s);
         break;
     }
 
@@ -136,7 +144,8 @@ void tisix::fmt_stream_impl(os stream, StringView fmt, FmtArgs args)
 
         else
         {
-            stream->putc(scan.current());
+            char s[] = {scan.current(), 0};
+            stream(s);
         }
 
         scan.forward();

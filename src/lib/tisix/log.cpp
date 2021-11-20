@@ -1,5 +1,6 @@
 #include "tisix/arch.hpp"
 #include <tisix/alloc.hpp>
+#include <tisix/host.hpp>
 #include <tisix/log.hpp>
 
 using namespace tisix;
@@ -24,9 +25,11 @@ void tisix::log_impl(const char *file, int line, StringView fmt, FmtArgs args, L
 {
     lock_acquire(&lock);
 
-    fmt_stream(get_arch()->debug_stream, "{} \033[30m{}:{}\033[0m ", get_name_from_logging_type(type), file, line);
+    fmt_stream(host_log_write, "{} \033[30m{}:{}\033[0m ", get_name_from_logging_type(type), file, line);
 
-    fmt_stream_impl(get_arch()->debug_stream, fmt, args);
-    get_arch()->debug_stream->write("\n");
+    fmt_stream_impl(host_log_write, fmt, args);
+
+    host_log_write("\n");
+
     lock_release(&lock);
 }

@@ -27,12 +27,9 @@ void apic_initialize(Acpi *acpi)
     base = acpi->lapic_base;
 
     lapic_write(APIC_TIMER_DIVIDER, 0x3);
-    log("uwu");
     lapic_write(APIC_TIMER_INITIAL_COUNT, 0xFFFFFFFF);
-    log("lol");
     pit_usleep(10);
 
-    log("ok");
     lapic_write(APIC_TIMER_REG, APIC_LVT_INT_MASKED);
 
     uint32_t tick_in_10ms = 0xFFFFFFFF - lapic_read(APIC_TIMER_CURRENT_COUNT);

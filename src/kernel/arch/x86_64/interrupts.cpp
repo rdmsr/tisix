@@ -3,6 +3,7 @@
 #include "pmm.hpp"
 #include "scheduler.hpp"
 #include "tisix/maybe.hpp"
+#include "vmm.hpp"
 #include <common.hpp>
 #include <devices/apic.hpp>
 #include <devices/pic.hpp>
@@ -45,9 +46,7 @@ static const char *exceptions[32] = {
     "Security Exception",
     "Reserved"};
 
-static volatile uint64_t counter = 9;
-
-static void backtrace(tisix::Stream<const char *> *s, uintptr_t rbp, uint64_t rip)
+static void backtrace(void (*s)(const char *), uintptr_t rbp, uint64_t rip)
 {
     Stack *stackframe = (Stack *)rbp;
 
@@ -66,7 +65,7 @@ void interrupt_error_handler(Stack *stackframe)
     uint64_t cr2 = asm_read_cr2();
     uint64_t cr3 = asm_read_cr3();
 
-    auto debug = get_arch()->debug_stream;
+    auto debug = host_log_write;
 
     fmt_stream(debug, "______________________\n");
     fmt_stream(debug, "< Wait, that's illegal >\n");

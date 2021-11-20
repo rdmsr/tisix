@@ -9,8 +9,7 @@ ARCH_KCXXFLAGS = \
 	-mcmodel=kernel -fno-use-cxa-atexit
 
 ARCH_CXXFLAGS = \
-	-Isrc/kernel/arch/x86_64 \
-	-fsanitize=undefined 
+	-Isrc/kernel/arch/x86_64 
 
 CROSS_AS=nasm
 CROSS_ASFLAGS=-g -felf64
