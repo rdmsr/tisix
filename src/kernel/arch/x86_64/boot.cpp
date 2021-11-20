@@ -1,0 +1,82 @@
+#include "gdt.hpp"
+#include "idt.hpp"
+#include "interrupts.hpp"
+#include "loader.hpp"
+#include "stivale2.hpp"
+#include "tasking.hpp"
+#include "tisix/alloc.hpp"
+#include "tisix/assert.hpp"
+#include "tisix/handover.hpp"
+#include "tisix/maybe.hpp"
+#include "tisix/std.hpp"
+#include <devices/apic.hpp>
+#include <devices/com.hpp>
+#include <devices/pic.hpp>
+#include <devices/pit.hpp>
+#include <firmware/acpi.hpp>
+#include <pmm.hpp>
+#include <scheduler.hpp>
+#include <tisix/arch.hpp>
+#include <tisix/vec.hpp>
+#include <vmm.hpp>
+
+using namespace tisix;
+
+void splash();
+
+void *operator new(size_t size)
+{
+    return malloc(size);
+}
+
+extern uint8_t stack[KERNEL_STACK_SIZE];
+
+void arch_entry_main(Handover *handover)
+{
+    COM com(COM1);
+
+    get_arch()->debug_stream = &com;
+
+    splash();
+
+    gdt_initialize(stack);
+    idt_initialize();
+
+    pic_initialize();
+
+    pit_initialize(1000);
+
+    Acpi acpi(handover);
+
+    apic_initialize(&acpi);
+
+    Pmm pmm(handover);
+
+    pmm.dump();
+
+    get_arch()->allocator = &pmm;
+
+    asm_cli();
+
+    Vmm vmm(&pmm, handover);
+
+    asm_sti();
+
+    get_arch()->kernel_pagemap = vmm.get_kernel_pagemap();
+
+    log("usable pages: {} ({} mb)", pmm.usable_pages, (pmm.usable_pages * PAGE_SIZE) / 1024 / 1024);
+
+    log("Modules:");
+    for (size_t i = 0; i < handover->modules.size; i++)
+    {
+        auto module = handover->modules.modules[i];
+
+        log("\t{} ({} bytes)", module.name, module.size);
+    }
+
+    loader_init();
+    loader_new_elf_task(handover->modules, "echo", TX_USER, vmm);
+
+    while (1)
+        ;
+}
