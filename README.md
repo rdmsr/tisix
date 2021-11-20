@@ -9,7 +9,7 @@
 - permissive license
 
 ## Why C++?
-C was becoming limiting in terms of metaprogramming and namespaces.In this repo, I try not to overuse C++ features such as templates and stuff that make code totally unreadable
+C was becoming limiting in terms of metaprogramming and namespaces. In this repo, I try not to overuse C++ features such as templates and stuff that make code totally unreadable
 
 ## MiCrOkErNelS aRe SlOw
 1. "Slow" is relative.
@@ -20,7 +20,7 @@ C was becoming limiting in terms of metaprogramming and namespaces.In this repo,
 - The `Arch` API thingy makes me lose my sanity.
 - No SMP
 - The scheduling algorithm could be greatly improved, its time_slice thing seems broken.
-- Servers'build system could also be improved.
+- The `servers`'s build system could also be improved.
 
 ## Architectures
 I plan on porting tisix to multiple architectures for the fun of it but, right now, I am focusing on x86_64 as I know it better so it's easier to debug and faster to develop.
