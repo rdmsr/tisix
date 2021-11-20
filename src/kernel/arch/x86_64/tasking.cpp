@@ -1,3 +1,4 @@
+#include "abi/syscalls.hpp"
 #include "tisix/alloc.hpp"
 #include "tisix/arch.hpp"
 #include "tisix/maybe.hpp"
@@ -7,10 +8,18 @@
 
 using namespace tisix;
 
+static uint64_t curr_id = 0;
+
 Task::Task(StringView name, uint8_t m_flags)
 {
     this->name = name;
+    this->id = curr_id;
+
+    curr_id++;
+
     this->flags = m_flags;
+
+    this->ipc_buffer = new TxIpc;
 
     auto stack = (uintptr_t)malloc(KERNEL_STACK_SIZE);
 
@@ -65,5 +74,5 @@ void Task::start(uintptr_t ip)
 
     this->stack = regs;
 
-    log("Started task {}...", name);
+    log("Started task {}({})...", name, id);
 }

@@ -6,6 +6,11 @@ extern "C" TxResult tx_sys_debug(const char *args)
     return tx_syscall(TX_SYS_DEBUG, (void *)args);
 }
 
+extern "C" TxResult tx_sys_ipc(TxIpc *ipc)
+{
+    return tx_syscall(TX_SYS_IPC, (void *)ipc);
+}
+
 extern "C" TxResult tx_syscall(TxSyscall syscall, void *arg)
 {
     uint64_t res = 0;

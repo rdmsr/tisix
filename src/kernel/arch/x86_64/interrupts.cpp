@@ -113,6 +113,8 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
 
                     prev_task = task;
 
+                    tisix::get_sched()->current_task = task;
+
                     *stackframe = task->stack;
 
                     if (task->flags & TX_USER)

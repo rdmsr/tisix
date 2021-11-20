@@ -3,13 +3,29 @@
 
 typedef int TxResult;
 
+struct PACKED TxIpc
+{
+    uint32_t from;
+    uint32_t to;
+
+    bool received = false;
+
+    bool send = true;
+
+    int number = 0;
+};
+
 #define SYSCALL(name) extern "C" TxResult tx_sys_##name
 
 SYSCALL(debug)
 (const char *args);
 
+SYSCALL(ipc)
+(TxIpc *ipc);
+
 #define FOREACH_SYSCALLS(SYSCALL_) \
-    SYSCALL_(DEBUG)
+    SYSCALL_(DEBUG)                \
+    SYSCALL_(IPC)
 
 typedef enum
 {

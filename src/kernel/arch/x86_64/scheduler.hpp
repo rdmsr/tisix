@@ -19,9 +19,10 @@ public:
 
     Task *current_task;
 
+    bool _ready = false;
+
 private:
     size_t index = 0;
-    bool _ready = false;
     size_t counter = 0;
     size_t time_slice = 1;
 };

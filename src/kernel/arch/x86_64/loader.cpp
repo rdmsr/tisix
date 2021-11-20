@@ -14,7 +14,7 @@ Scheduler *tisix::get_sched() { return scheduler; }
 
 void tisix::loader_init()
 {
-    scheduler = new Scheduler(10);
+    scheduler = new Scheduler(50);
 }
 
 uint64_t elf_load_program(Elf64Header *elf_header, Task *task)
@@ -46,6 +46,8 @@ void tisix::loader_new_elf_task(HandoverModules modules, StringView name, uint32
 {
     Task *new_task = new Task(name, flags);
     new_task->start(0);
+
+    get_sched()->_ready = false;
 
     Elf64Header *header = nullptr;
 

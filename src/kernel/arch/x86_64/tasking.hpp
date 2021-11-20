@@ -1,4 +1,5 @@
 #pragma once
+#include <abi/syscalls.hpp>
 #include <common.hpp>
 #include <tisix/string_view.hpp>
 #include <tisix/vec.hpp>
@@ -12,10 +13,14 @@ struct Task
 {
     Stack stack;
 
+    TxIpc *ipc_buffer;
+
     uintptr_t sp;
     uint64_t *pagemap;
 
     uint8_t flags;
+
+    uint64_t id = 0;
 
     tisix::StringView name;
 
