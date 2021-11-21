@@ -1,5 +1,6 @@
 #include "interrupts.hpp"
 #include "asm.hpp"
+#include "event.hpp"
 #include "pmm.hpp"
 #include "scheduler.hpp"
 #include "tisix/maybe.hpp"
@@ -90,6 +91,11 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
 {
     Stack *stackframe = (Stack *)rsp;
 
+    if (stackframe->intno >= 32 && stackframe->intno <= 48)
+    {
+        tisix::trigger_event((TxEvent){.type = TX_EVENT_IRQ, .irq = stackframe->intno - 32});
+    }
+
     if (stackframe->intno < 32)
     {
         interrupt_error_handler(stackframe);
@@ -133,7 +139,7 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
 
     else if (stackframe->intno == 0x42)
     {
-        syscall_dispatch((TxSyscall)stackframe->rax, stackframe->rbx);
+        syscall_dispatch((TxSyscall)stackframe->rbx, stackframe->rcx);
     }
 
     apic_eoi();

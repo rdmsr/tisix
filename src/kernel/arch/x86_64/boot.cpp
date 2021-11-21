@@ -13,6 +13,7 @@
 #include <devices/com.hpp>
 #include <devices/pic.hpp>
 #include <devices/pit.hpp>
+#include <event.hpp>
 #include <firmware/acpi.hpp>
 #include <pmm.hpp>
 #include <scheduler.hpp>
@@ -68,6 +69,8 @@ void arch_entry_main(Handover *handover)
 
         log("\t{} ({} bytes)", module.name, module.size);
     }
+
+    events_init();
 
     loader_init();
 

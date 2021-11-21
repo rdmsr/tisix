@@ -5,16 +5,18 @@
 extern "C" void _start()
 {
     TxIpc ipc;
-    ipc.send = false;
 
-    while (1)
+    ipc.flags = TX_IPC_RECV;
+
+    TxEvent irq0 = {.type = TX_EVENT_IRQ, .irq = 0};
+
+    tx_sys_bind(&irq0);
+
+    while (tx_sys_ipc(&ipc) == 0)
     {
-        tx_sys_ipc(&ipc);
-
-        if (ipc.received == true)
+        if (ipc.msg.event.type == TX_EVENT_IRQ)
         {
-            log("Received {} from task #{}", ipc.number, ipc.from);
-            break;
+            log("got timer interrupt");
         }
     }
 

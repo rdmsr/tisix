@@ -1,7 +1,10 @@
 #include "abi/syscalls.hpp"
+#include "event.hpp"
 #include "loader.hpp"
 #include "tisix/fmt.hpp"
+#include "tisix/maybe.hpp"
 #include "tisix/mem.hpp"
+#include <ipc.hpp>
 #include <loader.hpp>
 #include <syscalls.hpp>
 #include <tisix/arch.hpp>
@@ -25,37 +28,32 @@ TxResult sys_ipc(void *args)
 {
     auto unpacked = (TxIpc *)args;
 
-    if (unpacked->send == true && unpacked->to != get_sched()->current_task->id)
+    if ((unpacked->flags & TX_IPC_SEND) && unpacked->to != get_sched()->current_task->id)
     {
-        for (auto i : get_sched()->tasks)
-        {
-            if (i->id == unpacked->to)
-            {
-                tisix::memcpy(i->ipc_buffer, unpacked, sizeof(TxIpc));
 
-                i->ipc_buffer->from = get_sched()->current_task->id;
-
-                unpacked->received = true;
-
-                break;
-                return 0;
-            }
-
-            if (i == *get_sched()->tasks.end())
-                panic("ipc error: couldn't find task with id {}", unpacked->to);
-        }
-    }
-
-    else if (get_sched()->current_task->id != get_sched()->current_task->ipc_buffer->from)
-    {
-        tisix::memcpy(unpacked, get_sched()->current_task->ipc_buffer, sizeof(TxIpc));
-
-        unpacked->received = true;
+        ipc_send(unpacked);
 
         return 0;
     }
 
-    return -1;
+    else if (get_sched()->current_task->id != get_sched()->current_task->ipc_buffer->msg.from)
+    {
+
+        ipc_recv(unpacked);
+
+        return 0;
+    }
+
+    return 0;
+}
+
+TxResult sys_bind(void *args)
+{
+    auto unpacked = (TxEvent *)args;
+
+    tisix::bind_event(get_sched()->current_task, *unpacked);
+
+    return 0;
 }
 
 typedef TxResult TxSyscallFn(void *);
@@ -63,9 +61,13 @@ typedef TxResult TxSyscallFn(void *);
 static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_DEBUG] = sys_debug,
     [TX_SYS_IPC] = sys_ipc,
+    [TX_SYS_BIND] = sys_bind,
 };
 
 TxResult syscall_dispatch(TxSyscall sys_number, uint64_t args)
 {
-    return syscalls[sys_number]((void *)args);
+    auto result = syscalls[sys_number]((void *)args);
+
+    assert(result == 0);
+    return result;
 }

@@ -10,8 +10,8 @@ extern "C" void _start()
     TxIpc ipc;
 
     ipc.to = 0;
-    ipc.send = true;
-    ipc.number = 10;
+
+    ipc.msg.event.type = TX_EVENT_IRQ;
 
     tx_sys_ipc(&ipc);
 

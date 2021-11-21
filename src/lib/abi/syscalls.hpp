@@ -3,16 +3,47 @@
 
 typedef int TxResult;
 
-struct PACKED TxIpc
+enum TxEventType
+{
+    TX_EVENT_NONE,
+    TX_EVENT_IRQ
+};
+
+typedef uint64_t TxIrq;
+
+struct PACKED TxEvent
+{
+    TxEventType type = TX_EVENT_NONE;
+
+    union
+    {
+        TxIrq irq;
+    };
+};
+
+struct PACKED TxMsg
 {
     uint32_t from;
+
+    TxEvent event;
+};
+
+typedef uint32_t TxFlags;
+
+#define TX_IPC_NONE ((TxFlags)(0))
+#define TX_IPC_SEND ((TxFlags)(1 << 1))
+#define TX_IPC_RECV ((TxFlags)(1 << 2))
+#define TX_FROM_EVENT ((uint32_t)(1 << 2))
+
+struct PACKED TxIpc
+{
+    TxMsg msg;
+
     uint32_t to;
 
     bool received = false;
 
-    bool send = true;
-
-    int number = 0;
+    TxFlags flags = TX_IPC_SEND;
 };
 
 #define SYSCALL(name) extern "C" TxResult tx_sys_##name
@@ -23,9 +54,13 @@ SYSCALL(debug)
 SYSCALL(ipc)
 (TxIpc *ipc);
 
+SYSCALL(bind)
+(TxEvent *event);
+
 #define FOREACH_SYSCALLS(SYSCALL_) \
     SYSCALL_(DEBUG)                \
-    SYSCALL_(IPC)
+    SYSCALL_(IPC)                  \
+    SYSCALL_(BIND)
 
 typedef enum
 {

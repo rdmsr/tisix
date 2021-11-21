@@ -3,7 +3,6 @@
 
 static void pic_remap(void)
 {
-    // FIXME: stop using magic values
     asm_out8(PIC1, ICW1_INIT + ICW1_ICW4);
     asm_out8(PIC2, ICW1_INIT + ICW1_ICW4);
     asm_out8(PIC1_DATA, PIC1_OFFSET);

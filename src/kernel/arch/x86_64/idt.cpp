@@ -21,20 +21,12 @@ static IdtDescriptor idt_make_entry(uint64_t offset, uint8_t type)
 
 void install_isr(void)
 {
-    for (auto i = 0; i < 3; i++)
+    for (auto i = 0; i < 256; i++)
     {
         idt[i] = idt_make_entry(__interrupt_vector[i], INTGATE);
     }
 
-    idt[3] = idt_make_entry(__interrupt_vector[3], TRAPGATE);
-    idt[4] = idt_make_entry(__interrupt_vector[4], TRAPGATE);
-
-    for (auto i = 5; i < 48; i++)
-    {
-        idt[i] = idt_make_entry(__interrupt_vector[i], INTGATE);
-    }
-
-    idt[66] = idt_make_entry(__interrupt_vector[48], 0xee);
+    idt[66] = idt_make_entry(__interrupt_vector[66], 0xee);
 }
 
 void idt_initialize()
