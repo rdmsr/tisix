@@ -1,3 +1,4 @@
+#include "loader.hpp"
 #include "tisix/arch.hpp"
 #include <tisix/alloc.hpp>
 #include <tisix/host.hpp>

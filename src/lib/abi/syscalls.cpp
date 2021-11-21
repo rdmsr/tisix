@@ -1,5 +1,6 @@
 #include "abi/syscalls.hpp"
 #include <syscalls.hpp>
+
 extern "C" TxResult tx_sys_debug(const char *args)
 {
     return tx_syscall(TX_SYS_DEBUG, (void *)args);

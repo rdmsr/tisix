@@ -66,9 +66,10 @@ public:
 public:
     size_t size;
 
+    T *data;
+
 private:
     size_t capacity;
-    T *data;
 
 private:
     void resize()

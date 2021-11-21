@@ -9,6 +9,7 @@ extern "C" void _start(tisix::Handover *handover)
     log("hello from the echo server");
 
     log("handover = {#p}", (uint64_t)handover);
+
     while (1)
         ;
 }

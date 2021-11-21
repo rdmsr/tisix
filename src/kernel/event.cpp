@@ -34,8 +34,6 @@ void tisix::bind_event(Task *task, TxEvent event)
     EventBinding new_binding = {.task = task, .event = event};
 
     bindings.push(new_binding);
-
-    log("added binding to irq {} for task {}", event.irq, task->id);
 }
 
 void tisix::trigger_event(TxEvent event)
