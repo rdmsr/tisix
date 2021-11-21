@@ -17,6 +17,7 @@
 #include <firmware/acpi.hpp>
 #include <pmm.hpp>
 #include <scheduler.hpp>
+#include <syscalls.hpp>
 #include <tisix/arch.hpp>
 #include <tisix/vec.hpp>
 #include <vmm.hpp>
@@ -74,10 +75,11 @@ void arch_entry_main(Handover *handover)
 
     loader_init();
 
-    loader_new_elf_task(handover->modules, "echo", TX_USER);
-    loader_new_elf_task(handover->modules, "fb", TX_USER);
+    loader_new_elf_task(handover->modules, "echo", TX_USER, (void *)handover);
+    loader_new_elf_task(handover->modules, "fb", TX_USER, (void *)handover);
 
     get_sched()->_ready = true;
+
     while (1)
         ;
 }

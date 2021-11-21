@@ -99,6 +99,15 @@ static void stivale_modules_to_handover_modules(Handover *target, struct stivale
     }
 }
 
+static void stivale_fb_to_handover_fb(Handover *target, struct stivale2_struct_tag_framebuffer *fb)
+{
+    target->framebuffer.addr = fb->framebuffer_addr;
+    target->framebuffer.bpp = fb->framebuffer_bpp;
+    target->framebuffer.height = fb->framebuffer_height;
+    target->framebuffer.pitch = fb->framebuffer_pitch;
+    target->framebuffer.width = fb->framebuffer_width;
+}
+
 extern "C" void _kstart(struct stivale2_struct const *info)
 {
     Handover handover;
@@ -116,7 +125,11 @@ extern "C" void _kstart(struct stivale2_struct const *info)
     if (rsdp)
         handover.rsdp = ((struct stivale2_struct_tag_rsdp *)rsdp)->rsdp;
 
-    handover.framebuffer.present = false;
+    void *framebuffer = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
+    if (framebuffer)
+        stivale_fb_to_handover_fb(&handover, (stivale2_struct_tag_framebuffer *)framebuffer);
+
+    handover.framebuffer.present = true;
 
     arch_entry_main(&handover);
 }

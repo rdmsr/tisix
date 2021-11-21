@@ -4,7 +4,7 @@
 
 namespace tisix
 {
-void loader_new_elf_task(HandoverModules modules, StringView name, uint32_t flags);
+void loader_new_elf_task(HandoverModules modules, StringView name, uint32_t flags, void *args);
 Scheduler *get_sched();
 void loader_init();
 } // namespace tisix

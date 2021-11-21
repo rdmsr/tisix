@@ -1,6 +1,8 @@
 #include "pmm.hpp"
+#include "tisix/handover.hpp"
 #include "tisix/mem.hpp"
 #include "tisix/std.hpp"
+#include "vmm.hpp"
 #include <elf.hpp>
 #include <loader.hpp>
 #include <tisix/assert.hpp>
@@ -42,7 +44,7 @@ uint64_t elf_load_program(Elf64Header *elf_header, Task *task)
     return elf_header->entry;
 }
 
-void tisix::loader_new_elf_task(HandoverModules modules, StringView name, uint32_t flags)
+void tisix::loader_new_elf_task(HandoverModules modules, StringView name, uint32_t flags, void *args)
 {
     Task *new_task = new Task(name, flags);
     new_task->start(0);
@@ -65,7 +67,13 @@ void tisix::loader_new_elf_task(HandoverModules modules, StringView name, uint32
 
     assert(elf_validate(header) == true);
 
+    auto mem = malloc(sizeof(Handover));
+
+    memcpy(mem, args, sizeof(Handover));
+
     new_task->stack.rip = elf_load_program(header, new_task);
+
+    new_task->stack.rdi = (uint64_t)mem;
 
     get_sched()->add_task(new_task);
 }

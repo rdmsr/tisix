@@ -46,6 +46,13 @@ struct PACKED TxIpc
     TxFlags flags = TX_IPC_SEND;
 };
 
+struct PACKED TxMap
+{
+    uint64_t phys;
+    uint64_t virt;
+    uint64_t flags;
+};
+
 #define SYSCALL(name) extern "C" TxResult tx_sys_##name
 
 SYSCALL(debug)
@@ -57,10 +64,14 @@ SYSCALL(ipc)
 SYSCALL(bind)
 (TxEvent *event);
 
+SYSCALL(map)
+(TxMap *map);
+
 #define FOREACH_SYSCALLS(SYSCALL_) \
     SYSCALL_(DEBUG)                \
     SYSCALL_(IPC)                  \
-    SYSCALL_(BIND)
+    SYSCALL_(BIND)                 \
+    SYSCALL_(MAP)
 
 typedef enum
 {

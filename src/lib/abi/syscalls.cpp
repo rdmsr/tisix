@@ -15,6 +15,11 @@ extern "C" TxResult tx_sys_bind(TxEvent *event)
     return tx_syscall(TX_SYS_BIND, (void *)event);
 }
 
+extern "C" TxResult tx_sys_map(TxMap *map)
+{
+    return tx_syscall(TX_SYS_MAP, (void *)map);
+}
+
 extern "C" TxResult tx_syscall(TxSyscall syscall, void *arg)
 {
     // FIXME: get result of syscall

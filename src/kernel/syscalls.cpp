@@ -2,8 +2,11 @@
 #include "event.hpp"
 #include "loader.hpp"
 #include "tisix/fmt.hpp"
+#include "tisix/handover.hpp"
+#include "tisix/host.hpp"
 #include "tisix/maybe.hpp"
 #include "tisix/mem.hpp"
+#include "vmm.hpp"
 #include <ipc.hpp>
 #include <loader.hpp>
 #include <syscalls.hpp>
@@ -56,12 +59,23 @@ TxResult sys_bind(void *args)
     return 0;
 }
 
+TxResult sys_map(void *args)
+{
+    auto unpacked = (TxMap *)args;
+
+    host_map_memory(get_sched()->current_task->pagemap, unpacked->phys, unpacked->virt, unpacked->flags);
+
+    return 0;
+}
+
 typedef TxResult TxSyscallFn(void *);
 
 static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_DEBUG] = sys_debug,
     [TX_SYS_IPC] = sys_ipc,
     [TX_SYS_BIND] = sys_bind,
+    [TX_SYS_MAP] = sys_map,
+
 };
 
 TxResult syscall_dispatch(TxSyscall sys_number, uint64_t args)
