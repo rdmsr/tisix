@@ -1,8 +1,9 @@
 #pragma once
 #include "tisix/handover.hpp"
 #include <abi/syscalls.hpp>
+#include <interrupts.hpp>
 #include <tisix/std.hpp>
 
-TxResult syscall_dispatch(TxSyscall sys_number, uint64_t args);
+TxResult syscall_dispatch(Stack *stack, TxSyscall sys_number, uint64_t args);
 
 void sys_init(tisix::Handover *handover);

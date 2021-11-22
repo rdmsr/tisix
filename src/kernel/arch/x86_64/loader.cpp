@@ -16,7 +16,7 @@ Scheduler *tisix::get_sched() { return scheduler; }
 
 void tisix::loader_init()
 {
-    scheduler = new Scheduler(50);
+    scheduler = new Scheduler(20);
 }
 
 uint64_t elf_load_program(Elf64Header *elf_header, Task *task)

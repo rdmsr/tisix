@@ -78,10 +78,11 @@ static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
 
 };
 
-TxResult syscall_dispatch(TxSyscall sys_number, uint64_t args)
+TxResult syscall_dispatch(Stack *stack, TxSyscall sys_number, uint64_t args)
 {
     auto result = syscalls[sys_number]((void *)args);
 
-    assert(result == 0);
+    stack->rax = result;
+
     return result;
 }

@@ -83,4 +83,4 @@ typedef enum
         TX_SYS_COUNT
 } TxSyscall;
 
-extern "C" TxResult tx_syscall(TxSyscall syscall, void *arg);
+extern "C" TxResult tx_syscall(TxSyscall syscall, uint64_t arg0, uint64_t arg1 = 0, uint64_t arg2 = 0, uint64_t arg3 = 0, uint64_t arg4 = 0);

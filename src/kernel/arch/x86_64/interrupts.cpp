@@ -139,7 +139,7 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
 
     else if (stackframe->intno == 0x42)
     {
-        syscall_dispatch((TxSyscall)stackframe->rbx, stackframe->rcx);
+        syscall_dispatch(stackframe, (TxSyscall)stackframe->rax, stackframe->rbx);
     }
 
     apic_eoi();
