@@ -10,6 +10,5 @@ extern "C" void _start(tisix::Handover *handover)
 
     log("handover = {#p}", (uint64_t)handover);
 
-    while (1)
-        ;
+    tx_sys_exit(TX_SUCCESS);
 }

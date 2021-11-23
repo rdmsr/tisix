@@ -23,6 +23,11 @@ extern "C"
         return tx_syscall(TX_SYS_MAP, (uint64_t)map);
     }
 
+    TxResult tx_sys_exit(uint64_t args)
+    {
+        return tx_syscall(TX_SYS_EXIT, args);
+    }
+
     TxResult tx_syscall(TxSyscall syscall, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4)
     {
         uint64_t res = 0;

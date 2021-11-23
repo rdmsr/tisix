@@ -2,6 +2,7 @@
 #include "tisix/alloc.hpp"
 #include "tisix/arch.hpp"
 #include "tisix/maybe.hpp"
+#include <loader.hpp>
 #include <pmm.hpp>
 #include <tasking.hpp>
 #include <tisix/assert.hpp>
@@ -18,6 +19,8 @@ Task::Task(StringView name, uint8_t m_flags)
     curr_id++;
 
     this->flags = m_flags;
+    this->return_value = 0;
+    this->index = get_sched()->tasks.size;
 
     this->ipc_buffer = new TxIpc;
 

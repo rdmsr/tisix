@@ -34,7 +34,7 @@ extern "C" void _start(tisix::Handover *handover)
 
     int current_offset = 0;
 
-    while (tx_sys_ipc(&ipc) == 0)
+    while (tx_sys_ipc(&ipc) == TX_SUCCESS)
     {
         if (ipc.msg.event.irq == 0)
         {
@@ -53,6 +53,6 @@ extern "C" void _start(tisix::Handover *handover)
             current_offset++;
         }
     }
-    while (1)
-        ;
+
+    tx_sys_exit(TX_SUCCESS);
 }

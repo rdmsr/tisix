@@ -61,7 +61,10 @@ Maybe<Task *> Scheduler::tick()
         counter = 0;
 
         lock_release(&lock);
-        return Just(tasks[prev_index]);
+
+        if (tasks[prev_index]->running)
+            return Just(tasks[prev_index]);
+        return Nothing;
     }
 
     lock_release(&lock);

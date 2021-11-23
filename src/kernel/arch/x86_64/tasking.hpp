@@ -21,6 +21,10 @@ struct Task
     uint8_t flags;
 
     uint64_t id = 0;
+    uint64_t return_value = 0;
+    uint64_t index = 0;
+
+    bool running = true;
 
     tisix::StringView name;
 

@@ -67,11 +67,15 @@ SYSCALL(bind)
 SYSCALL(map)
 (TxMap *map);
 
+SYSCALL(exit)
+(uint64_t exit_code);
+
 #define FOREACH_SYSCALLS(SYSCALL_) \
     SYSCALL_(DEBUG)                \
     SYSCALL_(IPC)                  \
     SYSCALL_(BIND)                 \
-    SYSCALL_(MAP)
+    SYSCALL_(MAP)                  \
+    SYSCALL_(EXIT)
 
 typedef enum
 {
@@ -83,4 +87,13 @@ typedef enum
         TX_SYS_COUNT
 } TxSyscall;
 
-extern "C" TxResult tx_syscall(TxSyscall syscall, uint64_t arg0, uint64_t arg1 = 0, uint64_t arg2 = 0, uint64_t arg3 = 0, uint64_t arg4 = 0);
+enum TxErrors
+{
+    TX_SUCCESS,
+    TX_INVALID_PARAMS,
+    TX_NOT_FOUND,
+    TX_NOT_ALLOWED,
+};
+
+extern "C" TxResult
+tx_syscall(TxSyscall syscall, uint64_t arg0, uint64_t arg1 = 0, uint64_t arg2 = 0, uint64_t arg3 = 0, uint64_t arg4 = 0);
