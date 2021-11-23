@@ -72,6 +72,13 @@ TEST(Vec)
     some_vec.pop();
 
     UNIT_ASSERT(some_vec.size == 0);
+
+    some_vec.push(10);
+    some_vec.push(20);
+
+    some_vec.remove(1);
+    UNIT_ASSERT(some_vec.size == 1);
+    UNIT_ASSERT(some_vec[0] == 20);
 }
 
 TEST(List)

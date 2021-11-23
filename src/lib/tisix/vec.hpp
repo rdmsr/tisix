@@ -63,6 +63,14 @@ public:
     T *end() { return data + size; };
     T *begin() { return data; };
 
+    void remove(size_t index)
+    {
+        for (size_t i = index - 1; i < this->size; ++i)
+            data[i] = data[i + 1];
+
+        this->size--;
+    }
+
 public:
     size_t size;
 
