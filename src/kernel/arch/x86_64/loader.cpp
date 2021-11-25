@@ -11,12 +11,16 @@
 using namespace tisix;
 
 Scheduler *scheduler = nullptr;
+tisix::Handover *handover;
 
 Scheduler *tisix::get_sched() { return scheduler; }
 
-void tisix::loader_init()
+void tisix::loader_init(tisix::Handover *_handover)
 {
     scheduler = new Scheduler(20);
+    handover = new Handover;
+
+    memcpy(handover, _handover, sizeof(Handover));
 }
 
 uint64_t elf_load_program(Elf64Header *elf_header, Task *task)
@@ -44,14 +48,17 @@ uint64_t elf_load_program(Elf64Header *elf_header, Task *task)
     return elf_header->entry;
 }
 
-void tisix::loader_new_elf_task(HandoverModules modules, StringView name, uint32_t flags, void *args)
+void tisix::loader_new_elf_task(StringView name, uint32_t flags, void *args)
 {
     Task *new_task = new Task(name, flags);
+
     new_task->start(0);
 
     get_sched()->_ready = false;
 
     Elf64Header *header = nullptr;
+
+    auto modules = handover->modules;
 
     for (size_t i = 0; i < modules.size; i++)
     {
@@ -67,13 +74,16 @@ void tisix::loader_new_elf_task(HandoverModules modules, StringView name, uint32
 
     assert(elf_validate(header) == true);
 
-    auto mem = malloc(sizeof(Handover));
+    if (args)
+    {
+        auto mem = malloc(sizeof(Handover));
 
-    memcpy(mem, args, sizeof(Handover));
+        memcpy(mem, args, sizeof(Handover));
+
+        new_task->stack.rdi = (uint64_t)mem;
+    }
 
     new_task->stack.rip = elf_load_program(header, new_task);
-
-    new_task->stack.rdi = (uint64_t)mem;
 
     get_sched()->add_task(new_task);
 }

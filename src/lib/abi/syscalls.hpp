@@ -70,12 +70,16 @@ SYSCALL(map)
 SYSCALL(exit)
 (uint64_t exit_code);
 
+SYSCALL(exec)
+(const char *name, uint64_t param);
+
 #define FOREACH_SYSCALLS(SYSCALL_) \
     SYSCALL_(DEBUG)                \
     SYSCALL_(IPC)                  \
     SYSCALL_(BIND)                 \
     SYSCALL_(MAP)                  \
-    SYSCALL_(EXIT)
+    SYSCALL_(EXIT)                 \
+    SYSCALL_(EXEC)
 
 typedef enum
 {

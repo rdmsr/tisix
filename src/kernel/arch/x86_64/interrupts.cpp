@@ -3,6 +3,7 @@
 #include "event.hpp"
 #include "pmm.hpp"
 #include "scheduler.hpp"
+#include "tisix/alloc.hpp"
 #include "tisix/maybe.hpp"
 #include "vmm.hpp"
 #include <common.hpp>
@@ -142,6 +143,10 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
         syscall_dispatch(stackframe, (TxSyscall)stackframe->rax, stackframe->rbx);
     }
 
-    apic_eoi();
+    if (stackframe->intno != 0x42)
+    {
+        apic_eoi();
+    }
+
     return rsp;
 }

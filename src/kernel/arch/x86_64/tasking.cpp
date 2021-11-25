@@ -16,6 +16,11 @@ Task::Task(StringView name, uint8_t m_flags)
     this->name = name;
     this->id = curr_id;
 
+    if (this->id > get_sched()->tasks.size)
+    {
+        this->id = get_sched()->tasks.size;
+    }
+
     curr_id++;
 
     this->flags = m_flags;

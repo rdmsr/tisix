@@ -14,8 +14,12 @@
 
 using namespace tisix;
 
-TxResult sys_debug(uint64_t args)
+TxResult sys_debug(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
 {
+    (void)args2;
+    (void)args4;
+    (void)args5;
+
     auto unpacked = (char *)args;
 
     if (!unpacked)
@@ -28,8 +32,12 @@ TxResult sys_debug(uint64_t args)
     return TX_SUCCESS;
 }
 
-TxResult sys_ipc(uint64_t args)
+TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
 {
+    (void)args2;
+    (void)args4;
+    (void)args5;
+
     auto unpacked = (TxIpc *)args;
 
     if (!unpacked)
@@ -50,8 +58,12 @@ TxResult sys_ipc(uint64_t args)
     return TX_SUCCESS;
 }
 
-TxResult sys_bind(uint64_t args)
+TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
 {
+    (void)args2;
+    (void)args4;
+    (void)args5;
+
     auto unpacked = (TxEvent *)args;
 
     if (!unpacked)
@@ -64,8 +76,11 @@ TxResult sys_bind(uint64_t args)
     return TX_SUCCESS;
 }
 
-TxResult sys_map(uint64_t args)
+TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
 {
+    (void)args2;
+    (void)args4;
+    (void)args5;
 
     auto unpacked = (TxMap *)args;
 
@@ -79,8 +94,11 @@ TxResult sys_map(uint64_t args)
     return TX_SUCCESS;
 }
 
-TxResult sys_exit(uint64_t args)
+TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
 {
+    (void)args2;
+    (void)args4;
+    (void)args5;
 
     get_sched()->current_task->running = false;
     get_sched()->current_task->return_value = args;
@@ -90,10 +108,23 @@ TxResult sys_exit(uint64_t args)
     while (1)
         ;
 
-    return 0;
+    return TX_SUCCESS;
 }
 
-typedef TxResult TxSyscallFn(uint64_t);
+TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
+{
+    (void)args2;
+    (void)args4;
+    (void)args5;
+
+    auto name = (const char *)args;
+
+    loader_new_elf_task(name, TX_USER, (void *)args2);
+
+    return TX_SUCCESS;
+}
+
+typedef TxResult TxSyscallFn(uint64_t a, uint64_t b, uint64_t c, uint64_t d);
 
 static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_DEBUG] = sys_debug,
@@ -101,11 +132,12 @@ static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_BIND] = sys_bind,
     [TX_SYS_MAP] = sys_map,
     [TX_SYS_EXIT] = sys_exit,
+    [TX_SYS_EXEC] = sys_exec,
 };
 
 TxResult syscall_dispatch(Stack *stack, TxSyscall sys_number, uint64_t args)
 {
-    auto result = syscalls[sys_number](args);
+    auto result = syscalls[sys_number](args, stack->rcx, stack->rdx, stack->rsi);
 
     stack->rax = result;
 

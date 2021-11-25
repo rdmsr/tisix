@@ -111,8 +111,8 @@ INTERRUPT_NOERR 31
 %endrep
 
 
-    section .data
-    global __interrupt_vector
+section .data
+global __interrupt_vector
 
 __interrupt_vector:
 %assign i 0
