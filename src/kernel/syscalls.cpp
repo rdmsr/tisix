@@ -14,11 +14,11 @@
 
 using namespace tisix;
 
-TxResult sys_debug(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
+TxResult sys_debug(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
     (void)args2;
+    (void)args3;
     (void)args4;
-    (void)args5;
 
     auto unpacked = (char *)args;
 
@@ -32,11 +32,11 @@ TxResult sys_debug(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5
     return TX_SUCCESS;
 }
 
-TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
+TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
     (void)args2;
+    (void)args3;
     (void)args4;
-    (void)args5;
 
     auto unpacked = (TxIpc *)args;
 
@@ -58,11 +58,11 @@ TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
     return TX_SUCCESS;
 }
 
-TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
+TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
     (void)args2;
+    (void)args3;
     (void)args4;
-    (void)args5;
 
     auto unpacked = (TxEvent *)args;
 
@@ -76,11 +76,11 @@ TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
     return TX_SUCCESS;
 }
 
-TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
+TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
     (void)args2;
+    (void)args3;
     (void)args4;
-    (void)args5;
 
     auto unpacked = (TxMap *)args;
 
@@ -94,11 +94,11 @@ TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
     return TX_SUCCESS;
 }
 
-TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
+TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
     (void)args2;
+    (void)args3;
     (void)args4;
-    (void)args5;
 
     get_sched()->current_task->running = false;
     get_sched()->current_task->return_value = args;
@@ -111,15 +111,27 @@ TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
     return TX_SUCCESS;
 }
 
-TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args4, uint64_t args5)
+TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
     (void)args2;
+    (void)args3;
     (void)args4;
-    (void)args5;
 
     auto name = (const char *)args;
 
     loader_new_elf_task(name, TX_USER, (void *)args2);
+
+    return TX_SUCCESS;
+}
+
+TxResult sys_alloc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+{
+    (void)args3;
+    (void)args4;
+
+    auto unpacked = (void **)args2;
+
+    *unpacked = host_allocate_pages(args);
 
     return TX_SUCCESS;
 }
@@ -133,6 +145,7 @@ static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_MAP] = sys_map,
     [TX_SYS_EXIT] = sys_exit,
     [TX_SYS_EXEC] = sys_exec,
+    [TX_SYS_ALLOC] = sys_alloc,
 };
 
 TxResult syscall_dispatch(Stack *stack, TxSyscall sys_number, uint64_t args)

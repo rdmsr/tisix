@@ -33,6 +33,11 @@ extern "C"
         return tx_syscall(TX_SYS_EXEC, (uint64_t)name, param);
     }
 
+    TxResult tx_sys_alloc(uint64_t pages, void **ptr)
+    {
+        return tx_syscall(TX_SYS_ALLOC, pages, (uint64_t)ptr);
+    }
+
     TxResult tx_syscall(TxSyscall syscall, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4)
     {
         uint64_t res = 0;

@@ -1,6 +1,5 @@
 ECHO_BIN = $(BUILDDIR)/echo.elf
-ECHO_SRC = $(wildcard src/servers/echo/*.cpp) $(wildcard src/lib/abi/*.cpp) \
-	src/lib/tisix/log.cpp src/lib/tisix/fmt.cpp src/lib/tisix/string_view.cpp src/lib/tisix/scan.cpp src/lib/tisix/mem.cpp
+ECHO_SRC = $(wildcard src/servers/echo/*.cpp) $(wildcard src/lib/abi/*.cpp) $(wildcard src/lib/tisix/*.cpp)
 ECHO_OBJ = \
 	$(patsubst src/%.cpp, $(BUILDDIR)/%.cpp.o, $(ECHO_SRC)) \
 

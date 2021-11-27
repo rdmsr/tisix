@@ -77,6 +77,9 @@ void arch_entry_main(Handover *handover)
 
     loader_new_elf_task("init", TX_USER, (void *)handover);
 
+    loader_new_elf_task("echo", TX_USER, (void *)handover);
+    loader_new_elf_task("fb", TX_USER, (void *)handover);
+
     get_sched()->_ready = true;
 
     while (1)

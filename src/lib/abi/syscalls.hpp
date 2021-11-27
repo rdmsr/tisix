@@ -73,13 +73,16 @@ SYSCALL(exit)
 SYSCALL(exec)
 (const char *name, uint64_t param);
 
+SYSCALL(alloc)
+(uint64_t pages, void **ptr);
 #define FOREACH_SYSCALLS(SYSCALL_) \
     SYSCALL_(DEBUG)                \
     SYSCALL_(IPC)                  \
     SYSCALL_(BIND)                 \
     SYSCALL_(MAP)                  \
     SYSCALL_(EXIT)                 \
-    SYSCALL_(EXEC)
+    SYSCALL_(EXEC)                 \
+    SYSCALL_(ALLOC)
 
 typedef enum
 {
