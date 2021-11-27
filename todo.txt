@@ -1,2 +1,0 @@
-- Add syscall for launching tasks
-- Add syscall for exiting from tasks
