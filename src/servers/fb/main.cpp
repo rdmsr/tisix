@@ -1,5 +1,6 @@
 #include "tisix/gfx/canvas.hpp"
 #include "tisix/handover.hpp"
+#include <abi/layer.hpp>
 #include <abi/syscalls.hpp>
 #include <tisix/gfx/canvas.hpp>
 #include <tisix/log.hpp>
@@ -25,16 +26,10 @@ int handover_main(Handover *handover)
         }
     }
 
-    TxIpc ipc = {};
-    ipc.flags = TX_IPC_RECV;
+    tisix::ipc_on_receive([](TxIpc ipc)
+                          {
+                              log("received {} from #{}", ipc.msg.data, ipc.msg.from);
+                              return true; });
 
-    while (tx_sys_ipc(&ipc) == 0)
-    {
-        if (ipc.msg.type == TX_MSG_DATA)
-        {
-            log("Received {} from #{}", ipc.msg.data, ipc.msg.from);
-            break;
-        }
-    }
     return 0;
 }
