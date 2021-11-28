@@ -124,7 +124,7 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
 
                     *stackframe = task->stack;
 
-                    if (task->flags & TX_USER)
+                    if (task->flags & TX_TASK_USER)
                     {
                         asm_write_cr3((uint64_t)task->pagemap - MMAP_KERNEL_BASE);
                     }
