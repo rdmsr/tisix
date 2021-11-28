@@ -1,3 +1,4 @@
+#include "abi/syscalls.hpp"
 #include "gdt.hpp"
 #include "idt.hpp"
 #include "interrupts.hpp"
@@ -75,10 +76,10 @@ void arch_entry_main(Handover *handover)
 
     loader_init(handover);
 
-    loader_new_elf_task("init", TX_USER, (void *)handover);
+    loader_new_elf_task("init", TX_USER, TX_ENTRY_CMAIN, 0, 0, 0);
 
-    loader_new_elf_task("echo", TX_USER, (void *)handover);
-    loader_new_elf_task("fb", TX_USER, (void *)handover);
+    loader_new_elf_task("echo", TX_USER, TX_ENTRY_CMAIN, 0, 0, 0);
+    loader_new_elf_task("fb", TX_USER, TX_ENTRY_HANDOVER, (long)handover, 0, 0);
 
     get_sched()->_ready = true;
 

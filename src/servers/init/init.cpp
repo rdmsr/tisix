@@ -3,10 +3,9 @@
 #include <tisix/host.hpp>
 #include <tisix/log.hpp>
 
-extern "C" void _start(tisix::Handover *handover)
+int main(void)
 {
+    log("hello from init");
 
-    (void)handover;
-
-    tx_sys_exit(TX_SUCCESS);
+    return 0;
 }

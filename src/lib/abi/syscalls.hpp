@@ -9,6 +9,12 @@ enum TxEventType
     TX_EVENT_IRQ
 };
 
+enum TxEntryType
+{
+    TX_ENTRY_HANDOVER,
+    TX_ENTRY_CMAIN,
+};
+
 typedef uint64_t TxIrq;
 
 struct PACKED TxEvent

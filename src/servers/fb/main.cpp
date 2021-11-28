@@ -7,9 +7,8 @@
 
 using namespace tisix;
 
-extern "C" void _start(Handover *handover)
+int handover_main(Handover *handover)
 {
-
     log("hello from the fb server");
 
     auto fb = handover->framebuffer;
@@ -26,5 +25,5 @@ extern "C" void _start(Handover *handover)
         }
     }
 
-    tx_sys_exit(TX_SUCCESS);
+    return 0;
 }

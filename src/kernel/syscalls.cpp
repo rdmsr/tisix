@@ -113,13 +113,14 @@ TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 
 TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
+    (void)args;
     (void)args2;
     (void)args3;
     (void)args4;
 
-    auto name = (const char *)args;
+    //  auto name = (const char *)args;
 
-    loader_new_elf_task(name, TX_USER, (void *)args2);
+    // loader_new_elf_task(name, TX_USER, (void *)args2);
 
     return TX_SUCCESS;
 }

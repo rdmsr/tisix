@@ -1,3 +1,4 @@
+#include "abi/syscalls.hpp"
 #include "pmm.hpp"
 #include "tisix/handover.hpp"
 #include "tisix/mem.hpp"
@@ -48,7 +49,7 @@ uint64_t elf_load_program(Elf64Header *elf_header, Task *task)
     return elf_header->entry;
 }
 
-void tisix::loader_new_elf_task(StringView name, uint32_t flags, void *args)
+void tisix::loader_new_elf_task(StringView name, uint32_t flags, TxEntryType type, long arg1, long arg2, long arg3)
 {
     Task *new_task = new Task(name, flags);
 
@@ -74,14 +75,21 @@ void tisix::loader_new_elf_task(StringView name, uint32_t flags, void *args)
 
     assert(elf_validate(header) == true);
 
-    if (args)
+    new_task->stack.rdi = type;
+
+    new_task->stack.rsi = arg1;
+
+    if (type == TX_ENTRY_HANDOVER)
     {
         auto mem = malloc(sizeof(Handover));
 
-        memcpy(mem, args, sizeof(Handover));
+        memcpy(mem, (void *)arg1, sizeof(Handover));
 
-        new_task->stack.rdi = (uint64_t)mem;
+        new_task->stack.rsi = (uint64_t)mem;
     }
+
+    new_task->stack.rdx = arg2;
+    new_task->stack.rcx = arg3;
 
     new_task->stack.rip = elf_load_program(header, new_task);
 

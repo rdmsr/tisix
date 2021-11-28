@@ -24,7 +24,7 @@ const char *host_get_current_task()
 
 void *host_allocate_pages(size_t pages)
 {
-    return pmm_allocate(pages).value_or(panic_to_lambda("Allocation failed"));
+    return pmm_allocate_zero(pages).value_or(panic_to_lambda("Allocation failed"));
 }
 
 void host_free_pages(void *addr, size_t pages)

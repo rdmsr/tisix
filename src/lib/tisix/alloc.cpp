@@ -34,7 +34,7 @@ static int l_pageCount = 16;  //< Minimum number of pages to allocate.
 
 // ***********   HELPER FUNCTIONS  *******************************
 
-/** Returns the exponent required to manage 'size' amount of memory. 
+/** Returns the exponent required to manage 'size' amount of memory.
  *
  *  Returns n where  2^n <= size < 2^(n+1)
  */
