@@ -30,6 +30,8 @@ void tisix::ipc_send(TxIpc *args)
 void tisix::ipc_recv(TxIpc *buffer)
 {
     tisix::memcpy(buffer, get_sched()->current_task->ipc_buffer, sizeof(TxIpc));
+
     get_sched()->current_task->ipc_buffer->received = false;
-    get_sched()->current_task->ipc_buffer->msg.event.type = TX_EVENT_NONE;
+
+    get_sched()->current_task->ipc_buffer->msg.type = TX_MSG_NONE;
 }

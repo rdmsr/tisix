@@ -15,7 +15,14 @@ enum TxEntryType
     TX_ENTRY_CMAIN,
 };
 
-typedef uint64_t TxIrq;
+enum TxMsgType
+{
+    TX_MSG_NONE,
+    TX_MSG_DATA,
+    TX_MSG_EVENT,
+};
+
+typedef uint64_t TxData;
 
 struct PACKED TxEvent
 {
@@ -23,7 +30,7 @@ struct PACKED TxEvent
 
     union
     {
-        TxIrq irq;
+        TxData irq;
     };
 };
 
@@ -31,7 +38,13 @@ struct PACKED TxMsg
 {
     uint32_t from;
 
-    TxEvent event;
+    TxMsgType type = TX_MSG_EVENT;
+
+    union
+    {
+        TxEvent event;
+        TxData data;
+    };
 };
 
 typedef uint32_t TxFlags;

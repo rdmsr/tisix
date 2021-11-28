@@ -27,7 +27,7 @@ Task::Task(StringView name, uint8_t m_flags)
     this->return_value = 0;
     this->index = get_sched()->tasks.size;
 
-    this->ipc_buffer = new TxIpc;
+    this->ipc_buffer = (TxIpc *)malloc(sizeof(TxIpc));
 
     auto stack = (uintptr_t)malloc(KERNEL_STACK_SIZE);
 

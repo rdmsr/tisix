@@ -25,5 +25,16 @@ int handover_main(Handover *handover)
         }
     }
 
+    TxIpc ipc = {};
+    ipc.flags = TX_IPC_RECV;
+
+    while (tx_sys_ipc(&ipc) == 0)
+    {
+        if (ipc.msg.type == TX_MSG_DATA)
+        {
+            log("Received {} from #{}", ipc.msg.data, ipc.msg.from);
+            break;
+        }
+    }
     return 0;
 }

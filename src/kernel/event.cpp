@@ -42,7 +42,7 @@ void tisix::trigger_event(TxEvent event)
     {
         if (i.event.type == event.type && i.event.irq == event.irq)
         {
-            TxIpc msg;
+            TxIpc msg = {};
 
             msg.to = i.task->id;
             msg.flags = TX_IPC_SEND;
