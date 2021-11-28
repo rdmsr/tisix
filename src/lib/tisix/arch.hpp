@@ -17,6 +17,9 @@ extern "C"
     void arch_entry_main(tisix::Handover *handover);
     void arch_hang();
     void arch_panic_impl(const char *file, int line, tisix::StringView fmt, tisix::FmtArgs args);
+
+    uint32_t arch_in(uint16_t port, int size);
+    void arch_out(uint16_t port, uint32_t data, int size);
 }
 
 #define panic(fmt, ...) arch_panic_impl(__FILENAME__, __LINE__, fmt, tisix::fmt_make_storage(__VA_ARGS__).args);

@@ -49,9 +49,9 @@ uint64_t elf_load_program(Elf64Header *elf_header, Task *task)
     return elf_header->entry;
 }
 
-void tisix::loader_new_elf_task(StringView name, uint32_t flags, TxEntryType type, long arg1, long arg2, long arg3)
+void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, TxEntryType type, long arg1, long arg2, long arg3)
 {
-    Task *new_task = new Task(name, flags);
+    Task *new_task = new Task(name, flags, caps);
 
     new_task->start(0);
 

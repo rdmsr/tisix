@@ -3,6 +3,11 @@
 
 typedef int TxResult;
 
+#define TX_TASK_NONE (uint8_t)(0)
+#define TX_TASK_USER (uint8_t)(1 << 0)
+
+#define TX_CAP_IO (uint8_t)(1 << 0)
+
 enum TxEventType
 {
     TX_EVENT_NONE,
@@ -72,6 +77,13 @@ struct PACKED TxMap
     uint64_t flags;
 };
 
+struct PACKED TxIo
+{
+    uint16_t port;
+    uint32_t data;
+    int size;
+};
+
 #define SYSCALL(name) extern "C" TxResult tx_sys_##name
 
 SYSCALL(debug)
@@ -92,6 +104,12 @@ SYSCALL(exit)
 SYSCALL(exec)
 (const char *name, uint64_t param);
 
+SYSCALL(in)
+(TxIo *io);
+
+SYSCALL(out)
+(TxIo *io);
+
 SYSCALL(alloc)
 (uint64_t pages, void **ptr);
 #define FOREACH_SYSCALLS(SYSCALL_) \
@@ -101,7 +119,9 @@ SYSCALL(alloc)
     SYSCALL_(MAP)                  \
     SYSCALL_(EXIT)                 \
     SYSCALL_(EXEC)                 \
-    SYSCALL_(ALLOC)
+    SYSCALL_(ALLOC)                \
+    SYSCALL_(IN)                   \
+    SYSCALL_(OUT)
 
 typedef enum
 {
@@ -116,6 +136,7 @@ typedef enum
 enum TxErrors
 {
     TX_SUCCESS,
+    TX_BAD_CAPABILITY,
     TX_INVALID_PARAMS,
     TX_NOT_FOUND,
     TX_NOT_ALLOWED,

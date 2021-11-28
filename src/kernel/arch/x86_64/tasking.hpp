@@ -6,9 +6,6 @@
 
 #include <vmm.hpp>
 
-#define TX_NONE (uint8_t)(0)
-#define TX_USER (uint8_t)(1 << 0)
-
 struct Task
 {
     Stack stack;
@@ -19,6 +16,7 @@ struct Task
     uint64_t *pagemap;
 
     uint8_t flags;
+    uint8_t capabilities;
 
     uint64_t id = 0;
     uint64_t return_value = 0;
@@ -28,7 +26,7 @@ struct Task
 
     tisix::StringView name;
 
-    Task(tisix::StringView name, uint8_t flags);
+    Task(tisix::StringView name, uint8_t flags, uint8_t caps);
 
     void start(uintptr_t ip);
 

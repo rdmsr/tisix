@@ -76,10 +76,13 @@ void arch_entry_main(Handover *handover)
 
     loader_init(handover);
 
-    loader_new_elf_task("init", TX_USER, TX_ENTRY_CMAIN, 0, 0, 0);
+    loader_new_elf_task("init", TX_TASK_USER);
 
-    loader_new_elf_task("echo", TX_USER, TX_ENTRY_CMAIN, 0, 0, 0);
-    loader_new_elf_task("fb", TX_USER, TX_ENTRY_HANDOVER, (long)handover, 0, 0);
+    loader_new_elf_task("echo", TX_TASK_USER);
+
+    loader_new_elf_task("time", TX_TASK_USER, TX_CAP_IO);
+
+    loader_new_elf_task("fb", TX_TASK_USER, TX_TASK_NONE, TX_ENTRY_HANDOVER, (long)handover);
 
     get_sched()->_ready = true;
 

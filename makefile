@@ -54,7 +54,7 @@ endif
 
 include src/servers/.build.mk
 
-SERVERS += $(ECHO_BIN) $(FB_BIN) $(INIT_BIN)
+SERVERS += $(ECHO_BIN) $(FB_BIN) $(INIT_BIN) $(TIME_BIN)
 
 include sysroot/.build.mk
 

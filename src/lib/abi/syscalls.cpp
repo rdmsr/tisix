@@ -38,6 +38,16 @@ extern "C"
         return tx_syscall(TX_SYS_ALLOC, pages, (uint64_t)ptr);
     }
 
+    TxResult tx_sys_in(TxIo *io)
+    {
+        return tx_syscall(TX_SYS_IN, (uint64_t)io);
+    }
+
+    TxResult tx_sys_out(TxIo *io)
+    {
+        return tx_syscall(TX_SYS_OUT, (uint64_t)io);
+    }
+
     TxResult tx_syscall(TxSyscall syscall, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4)
     {
         uint64_t res = 0;

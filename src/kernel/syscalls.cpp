@@ -137,6 +137,34 @@ TxResult sys_alloc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4
     return TX_SUCCESS;
 }
 
+TxResult sys_in(uint64_t arg1, uint64_t, uint64_t, uint64_t)
+{
+    if (!(get_sched()->current_task->capabilities & TX_CAP_IO))
+    {
+        return TX_BAD_CAPABILITY;
+    }
+
+    auto unpacked = (TxIo *)arg1;
+
+    unpacked->data = arch_in(unpacked->port, unpacked->size);
+
+    return TX_SUCCESS;
+}
+
+TxResult sys_out(uint64_t arg1, uint64_t, uint64_t, uint64_t)
+{
+    if (!(get_sched()->current_task->capabilities & TX_CAP_IO))
+    {
+        return TX_BAD_CAPABILITY;
+    }
+
+    auto unpacked = (TxIo *)arg1;
+
+    arch_out(unpacked->port, unpacked->data, unpacked->size);
+
+    return TX_SUCCESS;
+}
+
 typedef TxResult TxSyscallFn(uint64_t a, uint64_t b, uint64_t c, uint64_t d);
 
 static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
@@ -147,7 +175,8 @@ static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_EXIT] = sys_exit,
     [TX_SYS_EXEC] = sys_exec,
     [TX_SYS_ALLOC] = sys_alloc,
-};
+    [TX_SYS_IN] = sys_in,
+    [TX_SYS_OUT] = sys_out};
 
 TxResult syscall_dispatch(Stack *stack, TxSyscall sys_number, uint64_t args)
 {

@@ -11,9 +11,10 @@ using namespace tisix;
 
 static uint64_t curr_id = 0;
 
-Task::Task(StringView name, uint8_t m_flags)
+Task::Task(StringView name, uint8_t m_flags, uint8_t caps)
 {
     this->name = name;
+
     this->id = curr_id;
 
     if (this->id > get_sched()->tasks.size)
@@ -24,6 +25,8 @@ Task::Task(StringView name, uint8_t m_flags)
     curr_id++;
 
     this->flags = m_flags;
+    this->capabilities = caps;
+
     this->return_value = 0;
     this->index = get_sched()->tasks.size;
 
@@ -33,7 +36,7 @@ Task::Task(StringView name, uint8_t m_flags)
 
     this->sp = stack + KERNEL_STACK_SIZE;
 
-    if (flags & TX_USER)
+    if (flags & TX_TASK_USER)
     {
         this->pagemap = (uint64_t *)((uint64_t)host_allocate_pages(1) + MMAP_KERNEL_BASE);
 
@@ -66,7 +69,7 @@ void Task::start(uintptr_t ip)
 
     regs.rflags = 0x202;
 
-    if (flags & TX_USER)
+    if (flags & TX_TASK_USER)
     {
         regs.cs = 0x23;
         regs.ss = 0x1b;

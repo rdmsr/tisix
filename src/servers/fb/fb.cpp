@@ -22,7 +22,7 @@ int handover_main(Handover *handover)
     {
         for (size_t j = 0; j < fb.height; j++)
         {
-            canvas.draw_pixel(canvas.color(40, 44, 52), i, j);
+            canvas.draw_pixel(canvas.color(0, 128, 0), i, j);
         }
     }
 
