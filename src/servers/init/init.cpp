@@ -18,23 +18,17 @@ int main(void)
 
     TxIpc ipc = {};
 
-    ipc.to = 2;
+    ipc.to = 2; // PID of time server
     ipc.msg.type = TX_MSG_REQUEST;
 
     tx_sys_ipc(&ipc);
 
     tisix::ipc_on_receive([](TxIpc ipc)
                           {
+                            Time *time = (Time *)ipc.msg.data;
 
-                        if(ipc.msg.type == TX_MSG_RESPONSE_DATA)
-                        {
-                            Time* time = (Time*)ipc.msg.data;
+                            log("Got time from time server: {}:{}:{}", time->hour, time->minute, time->second);
 
-                            log("Got time from time server: {}:{}:{}",time->hour, time->minute, time->second);
-
-                            return true;
-                        }
-
-                        return false; });
+                            return true; });
     return 0;
 }

@@ -53,17 +53,13 @@ int main(void)
 
     tisix::ipc_on_receive([](TxIpc ipc)
                           {
-                        Time* time = new Time;
-                        time->hour = read_cmos_data(HOUR);
-                        time->minute = read_cmos_data(MINUTE);
-                        time->second = read_cmos_data(SECOND);
+                            Time* time = new Time;
+                            time->hour = read_cmos_data(HOUR);
+                            time->minute = read_cmos_data(MINUTE);
+                            time->second = read_cmos_data(SECOND);
 
-                         TxIpc response = {};
-                         response.to = ipc.msg.from;
-                         response.msg.type = TX_MSG_RESPONSE_DATA;
-                         response.msg.data = (uint64_t)time;
-                         tx_sys_ipc(&response);
+                            tisix::ipc_send(ipc.msg.from, (uint64_t)time, TX_MSG_RESPONSE_DATA);
 
-                        return true; });
+                            return true; });
     return 0;
 }

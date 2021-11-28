@@ -14,4 +14,6 @@ SpaceBeforeInheritanceColon: true
 BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 Language: Cpp
+LambdaBodyIndentation: OuterScope
+
 ...
