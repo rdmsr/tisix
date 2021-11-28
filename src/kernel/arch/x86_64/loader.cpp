@@ -24,26 +24,30 @@ void tisix::loader_init(tisix::Handover *_handover)
     memcpy(handover, _handover, sizeof(Handover));
 }
 
-uint64_t elf_load_program(Elf64Header *elf_header, Task *task)
+uint64_t elf_load_program(uint64_t elf_base, Task *task)
 {
-    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
+    auto elf_header = (Elf64Header *)elf_base;
+
+    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)(elf_base + elf_header->program_header_table_file_offset);
 
     for (size_t i = 0; i < elf_header->program_header_table_entry_count; i++)
     {
+
         if (prog_header->type == ELF_PROGRAM_HEADER_LOAD)
         {
             auto new_addr = host_allocate_pages(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / 4096);
 
             for (size_t j = 0; j < ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / 4096; j++)
             {
+
                 host_map_memory(task->pagemap, j * PAGE_SIZE + (uint64_t)new_addr, j * PAGE_SIZE + prog_header->virtual_address, 0b111);
             }
 
-            tisix::memcpy((void *)((uint64_t)new_addr + MMAP_IO_BASE), (void *)((uint64_t)elf_header + prog_header->file_offset), prog_header->file_size);
+            tisix::memcpy((void *)((uint64_t)new_addr + MMAP_IO_BASE), (void *)(elf_base + prog_header->file_offset), prog_header->file_size);
             tisix::memset((void *)((uint64_t)new_addr + MMAP_IO_BASE + prog_header->file_size), 0, prog_header->memory_size - prog_header->file_size);
         }
 
-        prog_header += elf_header->program_header_table_entry_size;
+        prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);
     }
 
     return elf_header->entry;
@@ -91,7 +95,7 @@ void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, 
     new_task->stack.rdx = arg2;
     new_task->stack.rcx = arg3;
 
-    new_task->stack.rip = elf_load_program(header, new_task);
+    new_task->stack.rip = elf_load_program((uint64_t)header, new_task);
 
     get_sched()->add_task(new_task);
 }

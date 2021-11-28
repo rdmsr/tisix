@@ -27,11 +27,6 @@ using namespace tisix;
 
 void splash();
 
-void *operator new(size_t size)
-{
-    return malloc(size);
-}
-
 extern uint8_t stack[KERNEL_STACK_SIZE];
 
 void arch_entry_main(Handover *handover)
