@@ -38,17 +38,32 @@ bool cmos_is_update(void)
 
 #define time_pad(val) (val < 10) ? '0' : '\0'
 
+struct Time
+{
+    int hour = 0;
+    int minute = 0;
+    int second = 0;
+};
+
 int main(void)
 {
 
     while (cmos_is_update())
         ;
 
-    auto hour = read_cmos_data(HOUR);
-    auto minute = read_cmos_data(MINUTE);
-    auto second = read_cmos_data(SECOND);
+    tisix::ipc_on_receive([](TxIpc ipc)
+                          {
+                        Time* time = new Time;
+                        time->hour = read_cmos_data(HOUR);
+                        time->minute = read_cmos_data(MINUTE);
+                        time->second = read_cmos_data(SECOND);
 
-    log("Time is {}{}:{}{}:{}{}", time_pad(hour), hour, time_pad(minute), minute, time_pad(second), second);
+                         TxIpc response = {};
+                         response.to = ipc.msg.from;
+                         response.msg.type = TX_MSG_RESPONSE_DATA;
+                         response.msg.data = (uint64_t)time;
+                         tx_sys_ipc(&response);
 
+                        return true; });
     return 0;
 }

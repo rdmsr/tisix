@@ -507,7 +507,10 @@ void *realloc(void *p, size_t size)
 }
 
 } // namespace tisix
-
+void *operator new(size_t size)
+{
+    return tisix::malloc(size);
+}
 #else
 #    include <cstdlib>
 namespace tisix

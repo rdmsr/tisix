@@ -7,7 +7,7 @@ TARGETS += $(FB_BIN)
 
 $(BUILDDIR)/%.cpp.o: src/%.cpp
 	$(DIR_GUARD)
-	$(CROSS_CXX) -Isrc/lib/abi -c -o $@ $< $(CROSS_CXXFLAGS) -Os 
+	$(CROSS_CXX) -Isrc/lib/abi -c -o $@ $< $(CROSS_KCXXFLAGS)
 
 $(FB_BIN): $(FB_OBJ)
 	$(DIR_GUARD)

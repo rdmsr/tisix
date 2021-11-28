@@ -7,7 +7,7 @@ TARGETS += $(TIME_BIN)
 
 $(BUILDDIR)/%.cpp.o: src/%.cpp
 	$(DIR_GUARD)
-	$(CROSS_CXX) -Isrc/lib/abi -c -o $@ $< $(CROSS_CXXFLAGS) -Os 
+	$(CROSS_CXX) -Isrc/lib/abi -c -o $@ $< $(CROSS_KCXXFLAGS)
 
 $(TIME_BIN): $(TIME_OBJ)
 	$(DIR_GUARD)

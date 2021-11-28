@@ -25,6 +25,8 @@ enum TxMsgType
     TX_MSG_NONE,
     TX_MSG_DATA,
     TX_MSG_EVENT,
+    TX_MSG_REQUEST,
+    TX_MSG_RESPONSE_DATA,
 };
 
 typedef uint64_t TxData;

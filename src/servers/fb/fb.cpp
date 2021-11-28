@@ -26,10 +26,5 @@ int handover_main(Handover *handover)
         }
     }
 
-    tisix::ipc_on_receive([](TxIpc ipc)
-                          {
-                              log("received {} from #{}", ipc.msg.data, ipc.msg.from);
-                              return true; });
-
     return 0;
 }
