@@ -25,6 +25,7 @@ void lock_release(uint32_t *lock) { (void)lock; }
 
 namespace tisix
 {
+
 void *host_allocate_pages(size_t pages)
 {
     uint64_t _ptr;
@@ -35,12 +36,21 @@ void *host_allocate_pages(size_t pages)
     return (void *)ptr;
 }
 
+void host_free_pages(void *addr, size_t pages)
+{
+    tx_sys_free(addr, pages);
+}
+
 void *liballoc_alloc(int pages)
 {
     return (void *)((uint64_t)host_allocate_pages(pages) + MMAP_IO_BASE);
 }
 
-int liballoc_free(void *, int) { return 0; };
+int liballoc_free(void *p, int s)
+{
+    host_free_pages(p, s);
+    return 0;
+};
 
 int liballoc_lock() { return 0; }
 int liballoc_unlock() { return 0; }

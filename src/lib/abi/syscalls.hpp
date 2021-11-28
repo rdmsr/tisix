@@ -114,6 +114,10 @@ SYSCALL(out)
 
 SYSCALL(alloc)
 (uint64_t pages, void **ptr);
+
+SYSCALL(free)
+(void *ptr, uint64_t pages);
+
 #define FOREACH_SYSCALLS(SYSCALL_) \
     SYSCALL_(DEBUG)                \
     SYSCALL_(IPC)                  \
@@ -122,6 +126,7 @@ SYSCALL(alloc)
     SYSCALL_(EXIT)                 \
     SYSCALL_(EXEC)                 \
     SYSCALL_(ALLOC)                \
+    SYSCALL_(FREE)                 \
     SYSCALL_(IN)                   \
     SYSCALL_(OUT)
 

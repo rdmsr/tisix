@@ -36,8 +36,6 @@ bool cmos_is_update(void)
 
 #define read_cmos_data(name) from_binary_coded_decimal(cmos_read(CMOS_RTC_##name))
 
-#define time_pad(val) (val < 10) ? '0' : '\0'
-
 struct Time
 {
     int hour = 0;
@@ -48,12 +46,14 @@ struct Time
 int main(void)
 {
 
+    // Time server
     while (cmos_is_update())
         ;
 
     tisix::ipc_on_receive([](TxIpc ipc)
                           {
                             Time* time = new Time;
+
                             time->hour = read_cmos_data(HOUR);
                             time->minute = read_cmos_data(MINUTE);
                             time->second = read_cmos_data(SECOND);

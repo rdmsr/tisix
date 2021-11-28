@@ -29,7 +29,7 @@ void *host_allocate_pages(size_t pages)
 
 void host_free_pages(void *addr, size_t pages)
 {
-    pmm_free(addr, pages);
+    pmm_free((void *)((uint64_t)addr - MMAP_IO_BASE), pages);
 }
 
 void host_map_memory(uintptr_t *pagemap, uint64_t phys_addr, uint64_t virt_addr, uint64_t flags)

@@ -3,3 +3,4 @@
 -Isrc/kernel/arch/x86_64
 -std=c++17
 -Wno-pointer-arith
+-fno-exceptions

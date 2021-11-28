@@ -385,10 +385,11 @@ void free(void *ptr)
 
     liballoc_lock();
 
-    tag = (struct boundary_tag *)((uintptr_t *)ptr - sizeof(struct boundary_tag));
+    tag = (struct boundary_tag *)((uintptr_t)ptr - sizeof(struct boundary_tag));
 
     if (tag->magic != LIBALLOC_MAGIC)
     {
+
         liballoc_unlock(); // release the lock
         return;
     }
@@ -511,6 +512,17 @@ void *operator new(size_t size)
 {
     return tisix::malloc(size);
 }
+
+void operator delete(void *ptr, uint64_t)
+{
+    return tisix::free(ptr);
+}
+
+void operator delete(void *ptr)
+{
+    return tisix::free(ptr);
+}
+
 #else
 #    include <cstdlib>
 namespace tisix

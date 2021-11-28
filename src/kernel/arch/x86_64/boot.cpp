@@ -20,7 +20,6 @@
 #include <scheduler.hpp>
 #include <syscalls.hpp>
 #include <tisix/arch.hpp>
-#include <tisix/vec.hpp>
 #include <vmm.hpp>
 
 using namespace tisix;

@@ -137,6 +137,16 @@ TxResult sys_alloc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4
     return TX_SUCCESS;
 }
 
+TxResult sys_free(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+{
+    (void)args3;
+    (void)args4;
+
+    host_free_pages((void *)args, args2);
+
+    return TX_SUCCESS;
+}
+
 TxResult sys_in(uint64_t arg1, uint64_t, uint64_t, uint64_t)
 {
     if (!(get_sched()->current_task->capabilities & TX_CAP_IO))
@@ -175,6 +185,7 @@ static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_EXIT] = sys_exit,
     [TX_SYS_EXEC] = sys_exec,
     [TX_SYS_ALLOC] = sys_alloc,
+    [TX_SYS_FREE] = sys_free,
     [TX_SYS_IN] = sys_in,
     [TX_SYS_OUT] = sys_out};
 

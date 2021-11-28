@@ -33,9 +33,11 @@ void *liballoc_alloc(int n)
     return (void *)((uintptr_t)host_allocate_pages(n) + MMAP_IO_BASE);
 }
 
-void liballoc_free(void *ptr, int n)
+int liballoc_free(void *ptr, int n)
 {
     host_free_pages(ptr, n);
+
+    return 0;
 }
 
 void liballoc_lock() {}
