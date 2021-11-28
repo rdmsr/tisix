@@ -37,6 +37,15 @@ public:
         return {r, g, b};
     }
 
+    Color color(uint32_t hex)
+    {
+        uint8_t r = hex >> 16;
+        uint8_t g = hex >> 8;
+        uint8_t b = hex;
+
+        return {r, g, b};
+    }
+
 private:
     RawPixel *buffer;
     int width = 0, height = 0;
