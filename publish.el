@@ -24,7 +24,7 @@
  
 ;; :input-aggregate #'weblorg-input-aggregate-all-desc
  :template "page.html"
- :output "output/posts/{{ slug }}.html"
+ :output "docs/posts/{{ slug }}.html"
   :site (weblorg-site :base-url "")
  :url "posts/{{ slug }}.html")
 
@@ -34,7 +34,7 @@
  :input-pattern "posts/*.org"
  :input-aggregate #'weblorg-input-aggregate-all-desc
  :template "blog.html"
- :output "output/index.html"
+ :output "docs/index.html"
   :site (weblorg-site :base-url "") 
   :url "/")
 
@@ -43,14 +43,14 @@
  :input-pattern "posts/*.org"
  :input-aggregate #'weblorg-input-aggregate-all-desc
  :template "atom.html"
- :output "output/feed.xml"
+ :output "docs/feed.xml"
   :site (weblorg-site :base-url "")
   :url "/")
 
 
 ;; grab the static stuff
 (weblorg-copy-static
- :output "output/style/{{ file }}"
+ :output "docs/style/{{ file }}"
  :url "style/{{ file }}")
 
 ;; fire the engine and export all the files declared in the routes above
