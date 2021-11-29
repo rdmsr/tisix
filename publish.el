@@ -38,16 +38,6 @@
   :site (weblorg-site :base-url "") 
   :url "/")
 
-(weblorg-route
- :name "atom"
- :input-pattern "posts/*.org"
- :input-aggregate #'weblorg-input-aggregate-all-desc
- :template "atom.html"
- :output "feed.xml"
-  :site (weblorg-site :base-url "")
-  :url "/")
-
-
 ;; grab the static stuff
 (weblorg-copy-static
  :output "style/{{ file }}"
