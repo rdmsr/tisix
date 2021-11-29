@@ -1,0 +1,32 @@
+<head>
+  <link rel="stylesheet" href="../style/code.css">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="description" content="{{ post.description }}">
+  
+  <meta name="keywords" content="C++, tisix, unix, programming">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+  </style>
+
+
+  <title> tisix | {{ post.title }} </title>
+
+</head>
+
+<body>
+
+<header>
+  <a href="../index.html"> Home </a>
+  - <a href="../about.html"> About </a>
+<hr>
+</header>
+    <h1>{{ post.title }}</h1>
+    <p class="date"> {{post.date|strftime("%B %d, %Y")}} </p>
+    {{ post.html|safe }}
+
+
+    <p> <a href="../index.html"> Go back </a> </p>
+	
+</body>

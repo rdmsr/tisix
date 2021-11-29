@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom'>
+ <title>Abbix's blog</title>
+ <subtitle>Emacs and C programming.</subtitle>
+ <author>
+   <name>Abbix</name>
+   <email>abbix at riseup.net</email>   
+ </author>
+
+ <link href='https://blog.abbix.me'/>
+
+ {% for post in posts %}
+ <entry>
+  <title>{{ post.title }}</title>
+  <link href='{{ url_for("posts", slug=post.slug) }}'/>
+  <published>{{ post.date|strftime("%Y-%m-%dT:10:00:00Z") }}</published>
+  <content type='xhtml'>
+    <div class="atom_post">
+      {{ post.html|safe }}
+    </div>
+  </content>
+  </entry>
+  {% endfor %}
+</feed>

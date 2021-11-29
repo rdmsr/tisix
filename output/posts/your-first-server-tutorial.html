@@ -1,0 +1,285 @@
+<head>
+  <link rel="stylesheet" href="../style/code.css">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="description" content="undefined">
+  
+  <meta name="keywords" content="C++, tisix, unix, programming">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+  </style>
+
+
+  <title> tisix | Your first server (tutorial) </title>
+
+</head>
+
+<body>
+
+<header>
+  <a href="../index.html"> Home </a>
+  - <a href="../about.html"> About </a>
+<hr>
+</header>
+    <h1>Your first server (tutorial)</h1>
+    <p class="date"> November 28, 2021 </p>
+    <div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#what-is-a-server">1. What is a server?</a></li>
+<li><a href="#hello-world">2. Hello, World!</a>
+<ul>
+<li><a href="#setup">2.1. Setup</a></li>
+<li><a href="#build">2.2. Build</a></li>
+<li><a href="#code">2.3. Code</a></li>
+</ul>
+</li>
+<li><a href="#ipc">3. IPC</a>
+<ul>
+<li><a href="#sending">3.1. Sending</a></li>
+<li><a href="#receiving">3.2. Receiving</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">4. Conclusion</a></li>
+</ul>
+</div>
+</div>
+<p>
+This post shows you how you can create a server for tisix.
+</p>
+
+<div id="outline-container-what-is-a-server" class="outline-2">
+<h2 id="what-is-a-server"><span class="section-number-2">1.</span> What is a server?</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+A server, in the context of a microkernel, is a daemon program that has privileges given to it by the kernel.
+For example, a server could be a sound driver or a display server that manages windows.
+</p>
+</div>
+</div>
+
+<div id="outline-container-hello-world" class="outline-2">
+<h2 id="hello-world"><span class="section-number-2">2.</span> Hello, World!</h2>
+<div class="outline-text-2" id="text-hello-world">
+</div>
+<div id="outline-container-setup" class="outline-3">
+<h3 id="setup"><span class="section-number-3">2.1.</span> Setup</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+First, you need to create a new folder in the <code>src/servers/</code> directory, we'll call ours <code>hello</code>, this will be where we will put the build system and files.
+</p>
+
+<p>
+Now, create two files:  <code>src/servers/hello/hello.cpp</code>, <code>src/servers/hello/.build.mk</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-build" class="outline-3">
+<h3 id="build"><span class="section-number-3">2.2.</span> Build</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+In the .build.mk file, you can put the following code:
+</p>
+<div class="org-src-container">
+<pre class="src src-make">HELLO_BIN = $(BUILDDIR)/hello.elf
+HELLO_SRC = $(wildcard src/servers/hello/*.cpp) $(wildcard src/lib/abi/*.cpp) $(wildcard src/lib/tisix/*.cpp)
+HELLO_OBJ = \
+	$(patsubst src/%.cpp, $(BUILDDIR)/%.cpp.o, $(HELLO_SRC)) \
+
+TARGETS += $(HELLO_BIN)
+SERVERS += $(HELLO_BIN)
+
+$(BUILDDIR)/%.cpp.o: src/%.cpp
+	$(DIR_GUARD)
+	$(CROSS_CXX) -Isrc/lib/abi -c -o $@ $&lt; $(CROSS_KCXXFLAGS)
+
+$(HELLO_BIN): $(HELLO_OBJ)
+	$(DIR_GUARD)
+	$(CROSS_LD) -o $@ $^ $(CROSS_ALDFLAGS)
+
+</pre>
+</div>
+
+<p>
+Now, in the <code>src/servers/.build.mk</code>, add <code>include src/servers/hello/.build.mk</code>
+</p>
+</div>
+</div>
+<div id="outline-container-code" class="outline-3">
+<h3 id="code"><span class="section-number-3">2.3.</span> Code</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Let's start with a simple hello world program:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span class="org-preprocessor">#include</span> <span class="org-string"><span class="org-rainbow-delimiters-depth-1">&lt;</span></span><span class="org-string">tisix/log.hpp</span><span class="org-string"><span class="org-rainbow-delimiters-depth-1">&gt;</span></span>
+
+<span class="org-type">int</span> <span class="org-function-name">main</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">void</span><span class="org-rainbow-delimiters-depth-1">)</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+   log<span class="org-rainbow-delimiters-depth-2">(</span><span class="org-string">"Hello, World!"</span><span class="org-rainbow-delimiters-depth-2">)</span>;
+   <span class="org-keyword">return</span> 0;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+<p>
+As of today, there is no way of starting user programs from userspace. So if you want to run your server, see the boot.cpp file in the kernel directory, you should see how the kernel starts tasks.
+</p>
+
+<p>
+Once the task is started, you should now see the "Hello, World!" being printed to the screen!
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-ipc" class="outline-2">
+<h2 id="ipc"><span class="section-number-2">3.</span> IPC</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+One of the core components of a microkernel is interprocess-communication; it needs to be fast and easy to use.
+</p>
+
+<p>
+To achieve ipc using tisix, you can either use the <code>abi/layer.hpp</code> (recommended in C++ code) header which provides you abstractions or you can call the syscall directly using <code>abi/syscalls.hpp</code> (recommended in C code).
+</p>
+
+<p>
+In this tutorial, we'll use <code>layer.hpp</code>
+</p>
+</div>
+
+<div id="outline-container-sending" class="outline-3">
+<h3 id="sending"><span class="section-number-3">3.1.</span> Sending</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Here's how you can send a message (in this case, we'll send the number 10) to a task:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span class="org-preprocessor">#include</span> <span class="org-string"><span class="org-rainbow-delimiters-depth-1">&lt;</span></span><span class="org-string">abi/layer.hpp</span><span class="org-string"><span class="org-rainbow-delimiters-depth-1">&gt;</span></span>
+<span class="org-preprocessor">#include</span> <span class="org-string"><span class="org-rainbow-delimiters-depth-1">&lt;</span></span><span class="org-string">tisix/log.hpp</span><span class="org-string"><span class="org-rainbow-delimiters-depth-1">&gt;</span></span>
+
+<span class="org-type">int</span> <span class="org-function-name">main</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">void</span><span class="org-rainbow-delimiters-depth-1">)</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+  <span class="org-type">size_t</span> <span class="org-variable-name">pid</span> = 2; <span class="org-comment-delimiter">// </span><span class="org-comment">We want to send a message to pid 2</span>
+  <span class="org-type">size_t</span> <span class="org-variable-name">data</span> = 10; <span class="org-comment-delimiter">// </span><span class="org-comment">We want to send 10 to pid 2</span>
+
+  <span class="org-constant">tisix</span>::ipc_send<span class="org-rainbow-delimiters-depth-2">(</span>pid, data, TX_MSG_DATA<span class="org-rainbow-delimiters-depth-2">)</span>;
+
+  log<span class="org-rainbow-delimiters-depth-2">(</span><span class="org-string">"Goodbye!"</span><span class="org-rainbow-delimiters-depth-2">)</span>;
+
+  <span class="org-keyword">return</span> 0;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+<p>
+This should send a message containing 10 to the task assigned to pid #2.
+</p>
+</div>
+</div>
+<div id="outline-container-receiving" class="outline-3">
+<h3 id="receiving"><span class="section-number-3">3.2.</span> Receiving</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Sending is cool and all but it's pretty boring. Let's listen for IPC messages!
+</p>
+
+<p>
+To listen for IPC messages, we can use the <code>tisix::ipc_on_receive</code> function which takes as parameter a function pointer that itself has <code>TxIpc</code> as a parameter.
+</p>
+
+<p>
+Now what is <code>TxIpc</code>? It's the internal data structure of IPC messages; Let's take a look at its definition:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span class="org-keyword">struct</span> <span class="org-type">PACKED</span> <span class="org-variable-name">TxIpc</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+    TxMsg msg;
+
+    <span class="org-type">uint32_t</span> <span class="org-variable-name">to</span>;
+
+    <span class="org-type">bool</span> <span class="org-variable-name">received</span> = <span class="org-constant">false</span>;
+
+    <span class="org-type">TxFlags</span> <span class="org-variable-name">flags</span> = TX_IPC_SEND;
+<span class="org-rainbow-delimiters-depth-1">}</span>;
+</pre>
+</div>
+
+<p>
+Interesting! Now let's take a look at <code>TxMsg</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span class="org-keyword">struct</span> <span class="org-type">PACKED</span> <span class="org-variable-name">TxMsg</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+    uint32_t from;
+
+    <span class="org-type">TxMsgType</span> <span class="org-variable-name">type</span> = TX_MSG_EVENT;
+
+    <span class="org-keyword">union</span>
+    <span class="org-rainbow-delimiters-depth-2">{</span>
+        <span class="org-type">TxEvent</span> <span class="org-variable-name">event</span>;
+        <span class="org-type">TxData</span> <span class="org-variable-name">data</span>;
+    <span class="org-rainbow-delimiters-depth-2">}</span>;
+<span class="org-rainbow-delimiters-depth-1">}</span>;
+</pre>
+</div>
+
+<p>
+Seems like a message can contain either some data (<code>uint64_t</code>) or an event. We won't cover events here so we'll only focus on raw data.
+</p>
+
+<p>
+Now that we know about our data structures, let's listen for IPC messages! In C++, we can use lambdas as function pointers when they don't capture anything.
+</p>
+
+<p>
+Here's the code to listen for an IPC message:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c++"><span class="org-preprocessor">#include</span> <span class="org-string"><span class="org-rainbow-delimiters-depth-1">&lt;</span></span><span class="org-string">abi/layer.hpp</span><span class="org-string"><span class="org-rainbow-delimiters-depth-1">&gt;</span></span>
+<span class="org-preprocessor">#include</span> <span class="org-string"><span class="org-rainbow-delimiters-depth-1">&lt;</span></span><span class="org-string">tisix/log.hpp</span><span class="org-string"><span class="org-rainbow-delimiters-depth-1">&gt;</span></span>
+
+<span class="org-type">int</span> <span class="org-function-name">main</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">void</span><span class="org-rainbow-delimiters-depth-1">)</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+
+<span class="org-constant">tisix</span>::ipc_on_receive<span class="org-rainbow-delimiters-depth-2">(</span><span class="org-rainbow-delimiters-depth-3">[](</span><span class="org-type">TxIpc</span> <span class="org-variable-name">ipc</span><span class="org-rainbow-delimiters-depth-3">){</span>
+       log<span class="org-rainbow-delimiters-depth-4">(</span><span class="org-string">"Received ipc from {} with data {}"</span>, ipc.msg.from, ipc.msg.data<span class="org-rainbow-delimiters-depth-4">)</span>;
+       <span class="org-keyword">return</span> <span class="org-constant">true</span>;
+ <span class="org-rainbow-delimiters-depth-3">}</span><span class="org-rainbow-delimiters-depth-2">)</span>;
+
+<span class="org-keyword">return</span> 0;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+<p>
+As you can see, the lambda returns a boolean value; what does this mean? If the return value is <code>true</code>, the function will break from the listening loop, if it's <code>false</code>, the function will keep listening for messages.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-conclusion" class="outline-2">
+<h2 id="conclusion"><span class="section-number-2">4.</span> Conclusion</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+In this article, you learned how to make a basic server using tisix's libraries. In future tutorials, I'll cover events and capabilities.
+</p>
+</div>
+</div>
+
+
+
+    <p> <a href="../index.html"> Go back </a> </p>
+	
+</body>

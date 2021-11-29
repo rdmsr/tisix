@@ -1,0 +1,147 @@
+#+TITLE: Your first server (tutorial)
+#+DATE: 2021-11-28
+
+This post shows you how you can create a server for tisix.
+
+* What is a server?
+A server, in the context of a microkernel, is a daemon program that has privileges given to it by the kernel.
+For example, a server could be a sound driver or a display server that manages windows.
+
+* Hello, World!
+** Setup
+First, you need to create a new folder in the =src/servers/= directory, we'll call ours =hello=, this will be where we will put the build system and files.
+
+Now, create two files:  =src/servers/hello/hello.cpp=, =src/servers/hello/.build.mk=
+
+** Build
+In the .build.mk file, you can put the following code:
+#+begin_src make
+HELLO_BIN = $(BUILDDIR)/hello.elf
+HELLO_SRC = $(wildcard src/servers/hello/*.cpp) $(wildcard src/lib/abi/*.cpp) $(wildcard src/lib/tisix/*.cpp)
+HELLO_OBJ = \
+	$(patsubst src/%.cpp, $(BUILDDIR)/%.cpp.o, $(HELLO_SRC)) \
+
+TARGETS += $(HELLO_BIN)
+SERVERS += $(HELLO_BIN)
+
+$(BUILDDIR)/%.cpp.o: src/%.cpp
+	$(DIR_GUARD)
+	$(CROSS_CXX) -Isrc/lib/abi -c -o $@ $< $(CROSS_KCXXFLAGS)
+
+$(HELLO_BIN): $(HELLO_OBJ)
+	$(DIR_GUARD)
+	$(CROSS_LD) -o $@ $^ $(CROSS_ALDFLAGS)
+
+#+end_src
+
+Now, in the =src/servers/.build.mk=, add =include src/servers/hello/.build.mk=
+** Code
+Let's start with a simple hello world program:
+
+#+begin_src cpp
+ #include <tisix/log.hpp>
+  
+ int main(void)
+ {
+    log("Hello, World!");
+    return 0;
+ }
+#+end_src
+
+As of today, there is no way of starting user programs from userspace. So if you want to run your server, see the boot.cpp file in the kernel directory, you should see how the kernel starts tasks.
+
+Once the task is started, you should now see the "Hello, World!" being printed to the screen!
+
+
+* IPC
+One of the core components of a microkernel is interprocess-communication; it needs to be fast and easy to use.
+
+To achieve ipc using tisix, you can either use the =abi/layer.hpp= (recommended in C++ code) header which provides you abstractions or you can call the syscall directly using =abi/syscalls.hpp= (recommended in C code).
+
+In this tutorial, we'll use =layer.hpp=
+
+** Sending
+Here's how you can send a message (in this case, we'll send the number 10) to a task:
+
+#+begin_src c++
+  #include <abi/layer.hpp>
+  #include <tisix/log.hpp>
+  
+  int main(void)
+  {
+    size_t pid = 2; // We want to send a message to pid 2
+    size_t data = 10; // We want to send 10 to pid 2
+  
+    tisix::ipc_send(pid, data, TX_MSG_DATA);
+  
+    log("Goodbye!");
+  
+    return 0;
+  }
+#+end_src
+
+This should send a message containing 10 to the task assigned to pid #2.
+** Receiving
+Sending is cool and all but it's pretty boring. Let's listen for IPC messages!
+
+To listen for IPC messages, we can use the =tisix::ipc_on_receive= function which takes as parameter a function pointer that itself has =TxIpc= as a parameter.
+
+Now what is =TxIpc=? It's the internal data structure of IPC messages; Let's take a look at its definition:
+
+#+begin_src c++
+struct PACKED TxIpc
+{
+    TxMsg msg;
+
+    uint32_t to;
+
+    bool received = false;
+
+    TxFlags flags = TX_IPC_SEND;
+};
+#+end_src
+
+Interesting! Now let's take a look at =TxMsg=:
+
+#+begin_src c++
+struct PACKED TxMsg
+{
+    uint32_t from;
+
+    TxMsgType type = TX_MSG_EVENT;
+
+    union
+    {
+        TxEvent event;
+        TxData data;
+    };
+};
+#+end_src
+
+Seems like a message can contain either some data (=uint64_t=) or an event. We won't cover events here so we'll only focus on raw data.
+
+Now that we know about our data structures, let's listen for IPC messages! In C++, we can use lambdas as function pointers when they don't capture anything.
+
+Here's the code to listen for an IPC message:
+
+#+begin_src c++
+  #include <abi/layer.hpp>
+  #include <tisix/log.hpp>
+  
+  int main(void)
+  {
+  
+  tisix::ipc_on_receive([](TxIpc ipc){
+         log("Received ipc from {} with data {}", ipc.msg.from, ipc.msg.data);
+         return true;
+   });
+  
+  return 0;
+  }
+#+end_src
+
+As you can see, the lambda returns a boolean value; what does this mean? If the return value is =true=, the function will break from the listening loop, if it's =false=, the function will keep listening for messages.
+
+* Conclusion
+
+In this article, you learned how to make a basic server using tisix's libraries. In future tutorials, I'll cover events and capabilities.

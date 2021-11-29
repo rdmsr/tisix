@@ -1,0 +1,127 @@
+:root
+{
+    --onedark-blue: #61AFEF;
+    --onedark-turquoise: #56b6c2;
+    --onedark-green: #98c379;
+    --onedark-comment: #5c6370;
+    --onedark-red: #e06c75;
+    --onedark-orange: #da8548;
+    --onedark-yellow: #E5c07b;
+    --onedark-purple: #c678dd;
+}
+
+.org-rainbow-delimiters-depth-1  { color: var(--onedark-blue); }
+.org-rainbow-delimiters-depth-2  { color: var(--onedark-purple); }
+.org-rainbow-delimiters-depth-3  { color: var(--onedark-green); }
+.org-rainbow-delimiters-depth-4  { color: var(--onedark-orange); }
+.org-rainbow-delimiters-depth-5  { color: var(--onedark-yellow); }
+.org-rainbow-delimiters-depth-6  { color: var(--onedark-turquoise); }
+.org-rainbow-delimiters-depth-7  { color: var(--onedark-purple); }
+.org-rainbow-delimiters-depth-8  { color: var(--onedark-purple); }
+.org-rainbow-delimiters-depth-9  { color: var(--onedark-green); }
+.org-rainbow-delimiters-depth-10 { color: var(--onedark-orange); }
+
+@media only screen and (max-width: 768px) {
+	body 
+	{
+			margin: 0 auto !important;
+		    max-width: 768px !important;
+	}
+}
+
+
+body
+{
+    background: #fafafa;
+    color: #383a42;
+    font-family: 'Merriweather';
+    line-height: 160%;
+    font-size: 24px;
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 950px;
+
+}
+
+
+
+.date
+{
+    color: #677184;
+}
+
+code
+{
+    font-size: 22px;
+}
+
+pre
+{
+   color: #abb2bf;
+   background: #282c34;
+   border-radius: 4px;
+   font-size: 18px;
+   font-family: monospace;
+   line-height: 130%;
+   padding: 1rem;
+   display: inline-block;
+   min-width: 100%;
+}
+
+
+
+div
+{
+    display: block;
+}
+
+.org-type
+{
+    color: var(--onedark-yellow); 
+}
+
+.org-comment, .org-comment-delimiter
+{
+    color: var(--onedark-comment);
+}
+
+.org-string
+{
+   color: var(--onedark-green);
+
+}
+.org-keyword,.org-makefile-targets, .org-constant
+{
+    color: var(--onedark-blue);
+}
+
+a
+{
+    text-decoration: none;
+    color: #4078f2;
+}
+
+a:hover
+{
+text-decoration: underline;
+}
+
+
+h1
+{
+    font-size: 150%;
+    line-height: 110%;
+    font-weight: 400;
+}
+
+h2
+{
+    font-size: 130%;
+    font-weight: 400;
+}
+
+h3
+{
+    font-size: 120%;
+    font-weight: 400;
+}
