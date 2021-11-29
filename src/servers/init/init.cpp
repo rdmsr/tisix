@@ -19,7 +19,7 @@ int main(void)
                           {
                             Time *time = (Time *)ipc.msg.data;
 
-                            log("Got time from time server: {}{}:{}{}:{}{}", time_pad(time->hour), time->hour, time_pad(time->minute), time->minute, time_pad(time->second), time->second);
+                            log("Got time from pid #{}: {}{}:{}{}:{}{}", ipc.msg.from, time_pad(time->hour), time->hour, time_pad(time->minute), time->minute, time_pad(time->second), time->second);
 
                             return true; });
     return 0;

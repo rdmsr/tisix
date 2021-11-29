@@ -10,13 +10,13 @@ using namespace tisix;
 
 int handover_main(Handover *handover)
 {
-    log("hello from the fb server");
-
     auto fb = handover->framebuffer;
 
     log("Resolution is {}x{}", fb.width, fb.height);
 
     gfx::Canvas canvas(fb.addr, fb.width, fb.height);
+
+    log("Drawing to the screen...");
 
     for (size_t i = 0; i < fb.width; i++)
     {
