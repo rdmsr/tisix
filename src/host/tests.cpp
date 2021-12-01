@@ -92,8 +92,4 @@ TEST(List)
     UNIT_ASSERT(some_list.size == 1);
 
     UNIT_ASSERT(some_list[0] == some_list.head->data);
-
-    some_list.pop();
-
-    UNIT_ASSERT(some_list.size == 0);
 }
