@@ -45,7 +45,6 @@ struct Time
 
 int main(void)
 {
-
     // Time server
     while (cmos_is_update())
         ;

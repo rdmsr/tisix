@@ -22,5 +22,8 @@ int main(void)
                             log("Got time from pid #{}: {}{}:{}{}:{}{}", ipc.msg.from, time_pad(time->hour), time->hour, time_pad(time->minute), time->minute, time_pad(time->second), time->second);
 
                             return true; });
+
+    log("Exiting.");
+
     return 0;
 }
