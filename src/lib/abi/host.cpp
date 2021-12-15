@@ -36,22 +36,15 @@ void *host_allocate_pages(size_t pages)
     return (void *)ptr;
 }
 
+extern "C" void *host_get_alloc(size_t size)
+{
+    (void)size;
+    return nullptr;
+}
+
 void host_free_pages(void *addr, size_t pages)
 {
     tx_sys_free(addr, pages);
 }
-
-void *liballoc_alloc(int pages)
-{
-    return (void *)((uint64_t)host_allocate_pages(pages) + MMAP_IO_BASE);
-}
-
-int liballoc_free(void *p, int s)
-{
-    host_free_pages(p, s);
-    return 0;
-};
-
-int liballoc_lock() { return 0; }
-int liballoc_unlock() { return 0; }
 } // namespace tisix
+  // namespace tisix

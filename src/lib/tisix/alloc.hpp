@@ -1,88 +1,113 @@
-#ifndef _LIBALLOC_H
-#define _LIBALLOC_H
-#include <stddef.h>
-#include <stdint.h>
 #pragma once
+#include "tisix/arch.hpp"
+#include "tisix/maybe.hpp"
+#include "tisix/mem.hpp"
+#include <tisix/host.hpp>
+#include <tisix/std.hpp>
 
-#ifndef HOST
-#    ifdef __cplusplus
 namespace tisix
 {
-#    endif
 
-/** This is a boundary tag which is prepended to the
- * page or section of a page which we have allocated. It is
- * used to identify valid memory blocks that the
- * application is trying to free.
- */
-struct boundary_tag
+struct AllocFreeNode
 {
-    unsigned int magic;     //< It's a kind of ...
-    unsigned int size;      //< Requested size.
-    unsigned int real_size; //< Actual size.
-    int index;              //< Location in the page table.
-
-    struct boundary_tag *split_left;  //< Linked-list info for broken pages.
-    struct boundary_tag *split_right; //< The same.
-
-    struct boundary_tag *next; //< Linked list info.
-    struct boundary_tag *prev; //< Linked list info.
+    AllocFreeNode *next;
 };
 
-/** This function is supposed to lock the memory data structures. It
- * could be as simple as disabling interrupts or acquiring a spinlock.
- * It's up to you to decide. 
- *
- * \return 0 if the lock was acquired successfully. Anything else is
- * failure.
- */
-extern int liballoc_lock();
-
-/** This function unlocks what was previously locked by the liballoc_lock
- * function.  If it disabled interrupts, it enables interrupts. If it
- * had acquiried a spinlock, it releases the spinlock. etc.
- *
- * \return 0 if the lock was successfully released.
- */
-extern int liballoc_unlock();
-
-/** This is the hook into the local system which allocates pages. It
- * accepts an integer parameter which is the number of pages
- * required.  The page size was set up in the liballoc_init function.
- *
- * \return NULL if the pages were not allocated.
- * \return A pointer to the allocated memory.
- */
-extern void *liballoc_alloc(int);
-
-/** This frees previously allocated memory. The void* parameter passed
- * to the function is the exact same value returned from a previous
- * liballoc_alloc call.
- *
- * The integer value is the number of pages to free.
- *
- * \return 0 if the memory was successfully freed.
- */
-extern int liballoc_free(void *, int);
-
-void *malloc(size_t);          //< The standard function.
-void *realloc(void *, size_t); //< The standard function.
-void *calloc(size_t, size_t);  //< The standard function.
-void free(void *);             //< The standard function.
-
-#    ifdef __cplusplus
-}
-#    endif
-
-#else
-#    include <cstdlib>
-namespace tisix
+class Alloc
 {
+
+    uint8_t *buf = nullptr;
+
+    size_t chunk_size;
+    size_t buf_size = 0;
+
+public:
+    Alloc(uint8_t *buf, size_t size, size_t chunk_size_ = 256) : buf(buf), chunk_size(chunk_size_), buf_size(size)
+    {
+        head = nullptr;
+
+        this->free_all();
+    }
+
+    Alloc(){};
+
+    void construct(uint8_t *buf_, size_t size, size_t chunk_size_ = 256)
+    {
+        buf = buf_;
+        chunk_size = chunk_size_;
+        buf_size = size;
+
+        head = nullptr;
+        this->free_all();
+    }
+
+    Maybe<void *> allocate(size_t _size)
+    {
+        if (_size > chunk_size)
+        {
+            panic("Size {} too big for chunk size {}", _size, chunk_size);
+            return Nothing;
+        }
+
+        auto node = head;
+
+        if (!node)
+        {
+            panic("No free memory");
+            return Nothing;
+        }
+
+        head = head->next;
+
+        memset(node, 0, chunk_size);
+
+        return Just(node);
+    }
+
+    Maybe<bool> free(void *ptr)
+    {
+        auto start = buf;
+        auto end = &buf[buf_size];
+
+        if (!ptr)
+            return Nothing;
+
+        if (!(start <= ptr && ptr < end))
+        {
+            panic("memory out of bounds {#p} {#p} {#p}", ptr, (void *)start, (void *)end);
+            return Nothing;
+        }
+
+        auto node = (AllocFreeNode *)ptr;
+
+        node->next = head;
+
+        head = node;
+
+        return Just(true);
+    }
+
+    void free_all()
+    {
+        // Calculate number of chunks in alloc.
+        size_t chunk_count = buf_size / chunk_size;
+
+        for (size_t i = 0; i < chunk_count; i++)
+        {
+            void *ptr = &buf[i * chunk_size];
+
+            auto node = (AllocFreeNode *)ptr;
+
+            node->next = head;
+
+            head = node;
+        }
+    }
+
+    AllocFreeNode *head;
+};
+
+void *malloc(size_t size);
 void free(void *ptr);
 
-void *malloc(size_t s);
-void *realloc(void *p, size_t n);
 } // namespace tisix
-#endif
-
-#endif

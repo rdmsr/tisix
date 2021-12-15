@@ -25,26 +25,6 @@ const char *get_arch_name()
     return "x86_64";
 }
 
-namespace tisix
-{
-
-void *liballoc_alloc(int n)
-{
-    return (void *)((uintptr_t)host_allocate_pages(n) + MMAP_IO_BASE);
-}
-
-int liballoc_free(void *ptr, int n)
-{
-    host_free_pages(ptr, n);
-
-    return 0;
-}
-
-void liballoc_lock() {}
-void liballoc_unlock() {}
-
-} // namespace tisix
-
 void arch_panic_impl(const char *file, int line, tisix::StringView fmt, tisix::FmtArgs args)
 {
     fmt_stream(host_log_write, "\n------- \033[1;31mKernel panic\033[0m at {}:{} -------\n", file, line);

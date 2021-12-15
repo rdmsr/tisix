@@ -10,7 +10,8 @@ ifneq ($(CONFIG_ARCH), 0)
 		$(CXXFLAGS_INC) \
 		-ffreestanding \
 		-fno-rtti \
-		-fno-exceptions
+		-fno-exceptions \
+		-Wno-array-bounds 
 
 	CROSS_KCXXFLAGS= \
 		$(CROSS_CXXFLAGS) \

@@ -1,5 +1,6 @@
 #include "tisix/host.hpp"
 #include "loader.hpp"
+#include "tisix/arch.hpp"
 #include "tisix/maybe.hpp"
 #include <devices/com.hpp>
 #include <pmm.hpp>
@@ -7,11 +8,39 @@
 
 using namespace tisix;
 
-void host_log_putc(char c)
+static Alloc alloc = {};
+static Alloc page_alloc = {};
+static Alloc stack_alloc = {};
+
+void host_alloc_init()
 {
-    com_putc(COM1, c);
+    void *buf = (void *)((uint64_t)host_allocate_pages(2) + MMAP_IO_BASE);
+
+    alloc.construct((uint8_t *)buf, 8192, 256);
+
+    void *page_buf = (void *)((uint64_t)host_allocate_pages(4) + MMAP_IO_BASE);
+
+    page_alloc.construct((uint8_t *)page_buf, 16384, 4096);
+
+    void *stack_buf = (void *)((uint64_t)host_allocate_pages((KERNEL_STACK_SIZE * 8) / 4096) + MMAP_IO_BASE);
+
+    stack_alloc.construct((uint8_t *)stack_buf, KERNEL_STACK_SIZE * 8, KERNEL_STACK_SIZE);
 }
 
+void *host_get_alloc(size_t size)
+{
+    if (size <= 256)
+        return &alloc;
+
+    else if (size > 256 && size <= 4096)
+    {
+        return &page_alloc;
+    }
+
+    return &stack_alloc;
+}
+
+void host_log_putc(char c) { com_putc(COM1, c); }
 void host_log_write(const char *s)
 {
     com_write(COM1, s);

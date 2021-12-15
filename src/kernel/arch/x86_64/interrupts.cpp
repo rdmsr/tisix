@@ -4,6 +4,7 @@
 #include "pmm.hpp"
 #include "scheduler.hpp"
 #include "tisix/alloc.hpp"
+#include "tisix/host.hpp"
 #include "tisix/maybe.hpp"
 #include "vmm.hpp"
 #include <common.hpp>
@@ -83,6 +84,11 @@ void interrupt_error_handler(Stack *stackframe)
     fmt_stream(debug, "R8={#p}  R9={#p}  R10={#p} R11={#p}\n", stackframe->r8, stackframe->r9, stackframe->r10, stackframe->r11);
     fmt_stream(debug, "R12={#p} R13={#p} R14={#p} R15={#p}\n", stackframe->r12, stackframe->r13, stackframe->r14, stackframe->r15);
     fmt_stream(debug, "CR0={#p} CR2={#p} CR3={#p} RIP={#p}\n", cr0, cr2, cr3, stackframe->rip);
+    if (tisix::get_sched()->current_task)
+    {
+        fmt_stream(debug, "Running task is {}\n", tisix::get_sched()->current_task->name);
+    }
+
     backtrace(debug, stackframe->rbp, stackframe->rip);
 }
 

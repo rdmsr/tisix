@@ -38,6 +38,16 @@ public:
         return 0;
     }
 
+    T *begin()
+    {
+        return &((Node<T> *)(head - (size * sizeof(T))))->data;
+    }
+
+    T *end()
+    {
+        return &head->data;
+    }
+
     void push(T value)
     {
         Node<T> *temp = this->head;
@@ -57,6 +67,8 @@ public:
 
         this->size++;
     }
+
+    void construct(){};
 
 private:
     Node<T> *new_node(T value)

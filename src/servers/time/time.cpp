@@ -50,16 +50,18 @@ int main(void)
     while (cmos_is_update())
         ;
 
-    tisix::ipc_on_receive([](TxIpc ipc)
-                          {
-                            Time* time = new Time;
+    (void)from_binary_coded_decimal;
+    /* tisix::ipc_on_receive([](TxIpc ipc)
+                           {
+                             Time* time = new Time;
 
-                            time->hour = read_cmos_data(HOUR);
-                            time->minute = read_cmos_data(MINUTE);
-                            time->second = read_cmos_data(SECOND);
+                             time->hour = read_cmos_data(HOUR);
+                             time->minute = read_cmos_data(MINUTE);
+                             time->second = read_cmos_data(SECOND);
 
-                            tisix::ipc_send(ipc.msg.from, (uint64_t)time, TX_MSG_RESPONSE_DATA);
+                             tisix::ipc_send(ipc.msg.from, (uint64_t)time, TX_MSG_RESPONSE_DATA);
 
-                            return true; });
+                             return true; });
+                             */
     return 0;
 }

@@ -12,9 +12,9 @@ template <typename T>
 class Vec
 {
 public:
-    Vec()
+    Vec(size_t cap = 3)
     {
-        this->capacity = 3;
+        this->capacity = cap;
         this->size = 0;
         this->data = (T *)tisix::malloc(this->capacity * sizeof(*this->data));
 
@@ -22,9 +22,9 @@ public:
             panic("Couldn't allocate memory for dynamic array");
     }
 
-    void construct()
+    void construct(size_t cap = 3)
     {
-        this->capacity = 3;
+        this->capacity = cap;
         this->size = 0;
         this->data = (T *)tisix::malloc(this->capacity * sizeof(*this->data));
 
@@ -82,9 +82,11 @@ private:
 private:
     void resize()
     {
-        size_t capacity = this->capacity * 2;
+        T *tmp = (T *)tisix::malloc(this->capacity * sizeof(*this->data));
 
-        T *tmp = (T *)tisix::realloc(this->data, capacity * sizeof(*this->data));
+        this->capacity *= sizeof(*this->data);
+
+        memcpy(tmp, data, this->size);
 
         if (!tmp)
             panic("Couldn't realloc() dynamic array");

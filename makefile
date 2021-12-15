@@ -71,7 +71,7 @@ run: $(TARGETS)
 	qemu-system-$(CONFIG_ARCH) $(QEMU_ARGS) -serial stdio -no-reboot -no-shutdown -cdrom $(ISO)
 
 debug: $(TARGETS)
-	qemu-system-$(CONFIG_ARCH) -d int -no-reboot -no-shutdown -m 256M -serial stdio -cdrom $(ISO)
+	qemu-system-$(CONFIG_ARCH) -no-reboot -no-shutdown -m 256M -serial stdio -cdrom $(ISO) -d int
 
 
 .PHONY: clean

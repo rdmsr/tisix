@@ -8,7 +8,8 @@ CROSS_CXXFLAGS= \
 	$(CXXFLAGS_INC) \
 	-ffreestanding \
 	-fno-rtti \
-	-fno-exceptions
+	-fno-exceptions \
+	-Wno-c99-designator -g
 
 CROSS_KCXXFLAGS= \
 	$(CROSS_CXXFLAGS) \
@@ -37,7 +38,7 @@ CROSS_ARFLAGS=rcs
 
 else
 	CROSS_CXX=clang++
-	CROSS_CXXFLAGS = $(ARCH_CXXFLAGS)
+	CROSS_CXXFLAGS = $(ARCH_CXXFLAGS) -g
 
 	CROSS_LD=ld.lld
 endif

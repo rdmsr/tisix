@@ -38,3 +38,10 @@ void tisix::memcpy(void *d, void *s, size_t n)
     for (size_t i = 0; i < n; i++)
         cdest[i] = csrc[i];
 }
+
+extern "C" void memcpy(void *d, void *s, size_t n)
+{
+    return tisix::memcpy(d, s, n);
+}
+
+extern "C" void atexit(void){};

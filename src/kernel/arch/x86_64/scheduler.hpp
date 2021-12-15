@@ -1,5 +1,6 @@
 #pragma once
 #include <tasking.hpp>
+#include <tisix/vec.hpp>
 
 namespace tisix
 {

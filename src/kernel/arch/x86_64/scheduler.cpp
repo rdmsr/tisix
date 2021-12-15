@@ -64,6 +64,7 @@ Maybe<Task *> Scheduler::tick()
 
         if (tasks[prev_index]->running)
             return Just(tasks[prev_index]);
+
         return Nothing;
     }
 

@@ -1,15 +1,8 @@
-#include "abi/syscalls.hpp"
 #include "gdt.hpp"
 #include "idt.hpp"
-#include "interrupts.hpp"
 #include "loader.hpp"
-#include "stivale2.hpp"
 #include "tasking.hpp"
-#include "tisix/alloc.hpp"
-#include "tisix/assert.hpp"
-#include "tisix/handover.hpp"
-#include "tisix/maybe.hpp"
-#include "tisix/std.hpp"
+#include "tisix/host.hpp"
 #include <devices/apic.hpp>
 #include <devices/com.hpp>
 #include <devices/pic.hpp>
@@ -18,11 +11,15 @@
 #include <firmware/acpi.hpp>
 #include <pmm.hpp>
 #include <scheduler.hpp>
-#include <syscalls.hpp>
-#include <tisix/arch.hpp>
 #include <vmm.hpp>
 
 using namespace tisix;
+
+void *operator new(size_t count)
+{
+
+    return malloc(count);
+}
 
 void splash();
 
@@ -55,6 +52,8 @@ void arch_entry_main(Handover *handover)
     vmm_initialize(handover);
 
     asm_sti();
+
+    host_alloc_init();
 
     log("usable pages: {} ({} mb)", pmm_get_usable_pages(), (pmm_get_usable_pages() * PAGE_SIZE) / 1024 / 1024);
 
