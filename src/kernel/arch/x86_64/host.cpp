@@ -48,8 +48,8 @@ void host_log_write(const char *s)
 
 const char *host_get_current_task()
 {
-    if(get_sched())
-        return get_sched()->current_task->name;
+    if (get_sched())
+        return get_sched()->current_task->name.buffer;
     return nullptr;
 }
 
