@@ -5,6 +5,7 @@
 #include "tisix/host.hpp"
 #include "vmm.hpp"
 #include <asm.hpp>
+#include <gdt.hpp>
 #include <ipc.hpp>
 #include <loader.hpp>
 #include <syscalls.hpp>
@@ -13,6 +14,11 @@
 #include <tisix/std.hpp>
 
 using namespace tisix;
+void syscall_set_gs(uintptr_t addr)
+{
+    asm_write_msr(MSR_GS_BASE, addr);
+    asm_write_msr(MSR_KERN_GS_BASE, addr);
+}
 
 TxResult sys_debug(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
@@ -76,11 +82,15 @@ TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
     return TX_SUCCESS;
 }
 
+static uint32_t lock = 0;
+
 TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
     (void)args2;
     (void)args3;
     (void)args4;
+
+    lock_acquire(&lock);
 
     auto unpacked = (TxMap *)args;
 
@@ -89,7 +99,13 @@ TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
         return TX_INVALID_PARAMS;
     }
 
-    host_map_memory(get_sched()->current_task->pagemap, unpacked->phys, unpacked->virt, unpacked->flags);
+    for (size_t i = 0; i < ALIGN_UP(unpacked->size, 4096) / 4096; i++)
+    {
+
+        host_map_memory(get_sched()->current_task->pagemap, i * PAGE_SIZE + unpacked->phys, i * PAGE_SIZE + unpacked->virt, unpacked->flags);
+    }
+
+    lock_release(&lock);
 
     return TX_SUCCESS;
 }
@@ -103,18 +119,16 @@ TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
     get_sched()->current_task->running = false;
     get_sched()->current_task->return_value = args;
 
-    asm_sti();
-
     while (1)
     {
         asm_sti();
     }
-
     return TX_SUCCESS;
 }
 
 TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 {
+
     (void)args;
     (void)args2;
     (void)args3;
@@ -122,7 +136,7 @@ TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 
     auto name = (const char *)args;
 
-    loader_new_elf_task(name, TX_TASK_USER);
+    loader_new_elf_task(name, TX_TASK_USER, 0);
 
     return TX_SUCCESS;
 }
@@ -191,6 +205,11 @@ static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_IN] = sys_in,
     [TX_SYS_OUT] = sys_out};
 
+extern "C" void syscall_handler(Stack *stack)
+{
+    syscall_dispatch(stack, (TxSyscall)stack->rax, stack->rbx);
+}
+
 TxResult syscall_dispatch(Stack *stack, TxSyscall sys_number, uint64_t args)
 {
     auto result = syscalls[sys_number](args, stack->rcx, stack->rdx, stack->rsi);
@@ -198,4 +217,14 @@ TxResult syscall_dispatch(Stack *stack, TxSyscall sys_number, uint64_t args)
     stack->rax = result;
 
     return result;
+}
+
+extern "C" void syscall_handle(void);
+
+void syscall_init(void)
+{
+    asm_write_msr(MSR_EFER, asm_read_msr(MSR_EFER) | 1);
+    asm_write_msr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << 32) | ((uint64_t)(((GDT_USER_DATA - 1) * 8) | 3) << 48));
+    asm_write_msr(MSR_LSTAR, (uint64_t)syscall_handle);
+    asm_write_msr(MSR_SYSCALL_FLAG_MASK, 0);
 }

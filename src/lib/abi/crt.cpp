@@ -32,7 +32,6 @@ extern "C" void _start(TxEntryType type, long arg1, long arg2, long arg3)
 
     case TX_ENTRY_HANDOVER:
     {
-
         ex = handover_main((tisix::Handover *)arg1);
         break;
     }

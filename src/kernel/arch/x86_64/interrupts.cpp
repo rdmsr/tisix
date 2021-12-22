@@ -128,6 +128,8 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
 
                     tisix::get_sched()->current_task = task;
 
+                    syscall_set_gs((uintptr_t)task);
+
                     *stackframe = task->stack;
 
                     if (task->flags & TX_TASK_USER)

@@ -18,13 +18,13 @@ void host_alloc_init()
 
     alloc.construct((uint8_t *)buf, 8192, 256);
 
-    void *page_buf = (void *)((uint64_t)host_allocate_pages(4) + MMAP_IO_BASE);
+    void *page_buf = (void *)((uint64_t)host_allocate_pages(10) + MMAP_IO_BASE);
 
-    page_alloc.construct((uint8_t *)page_buf, 16384, 4096);
+    page_alloc.construct((uint8_t *)page_buf, 4096 * 10, 4096);
 
-    void *stack_buf = (void *)((uint64_t)host_allocate_pages((KERNEL_STACK_SIZE * 8) / 4096) + MMAP_IO_BASE);
+    void *stack_buf = (void *)((uint64_t)host_allocate_pages((KERNEL_STACK_SIZE * 10) / 4096) + MMAP_IO_BASE);
 
-    stack_alloc.construct((uint8_t *)stack_buf, KERNEL_STACK_SIZE * 8, KERNEL_STACK_SIZE);
+    stack_alloc.construct((uint8_t *)stack_buf, KERNEL_STACK_SIZE * 10, KERNEL_STACK_SIZE);
 }
 
 void *host_get_alloc(size_t size)

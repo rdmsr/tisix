@@ -1,5 +1,5 @@
 #pragma once
-#include "abi/syscalls.hpp"
+#include <abi/syscalls.hpp>
 #include <syscalls.hpp>
 
 namespace tisix

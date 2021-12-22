@@ -83,6 +83,9 @@ void Task::start(uintptr_t ip)
         pagemap = vmm_get_kernel_pagemap();
     }
 
+    this->syscall_kernel_bstack = (uintptr_t)malloc(KERNEL_STACK_SIZE);
+    this->syscall_kernel_stack = this->syscall_kernel_bstack + KERNEL_STACK_SIZE;
+
     this->stack = regs;
 
     log("Started task {}({})...", name, id);

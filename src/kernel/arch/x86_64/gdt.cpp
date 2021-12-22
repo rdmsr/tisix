@@ -72,7 +72,6 @@ void gdt_initialize(uint8_t *kernel_stack)
     memset(&tss, 0, sizeof(tss));
 
     tss.rsp[0] = (uintptr_t)kernel_stack + sizeof(kernel_stack);
-    tss.ist[1] = 0;
 
     tss.iopb_offset = sizeof(tss);
 

@@ -1,9 +1,10 @@
 #include "ipc.hpp"
 #include "tisix/list.hpp"
 #include <event.hpp>
+#include <tisix/vec.hpp>
 
 using namespace tisix;
-static List<EventBinding> bindings;
+static Vec<EventBinding> bindings;
 
 void tisix::events_init()
 {

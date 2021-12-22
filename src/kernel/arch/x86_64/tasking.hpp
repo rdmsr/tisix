@@ -8,11 +8,17 @@
 
 struct Task
 {
+
+    uintptr_t syscall_kernel_stack;
+    uintptr_t syscall_user_stack;
+    uintptr_t syscall_kernel_bstack;
+
+    uintptr_t sp;
+
     Stack stack;
 
     TxIpc *ipc_buffer;
 
-    uintptr_t sp;
     uint64_t *pagemap;
 
     uint8_t flags;

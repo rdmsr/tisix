@@ -33,6 +33,5 @@ void arch_panic_impl(const char *file, int line, tisix::StringView fmt, tisix::F
 
 int main()
 {
-
     return tisix::test_run_all();
 }

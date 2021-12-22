@@ -77,6 +77,7 @@ struct PACKED TxMap
     uint64_t phys;
     uint64_t virt;
     uint64_t flags;
+    size_t size;
 };
 
 struct PACKED TxIo

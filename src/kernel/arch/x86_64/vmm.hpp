@@ -11,3 +11,4 @@ void vmm_map_range(uint64_t *pagemap, uint64_t start, uint64_t end, uint64_t off
 void vmm_unmap_page(uint64_t *pagemap, uintptr_t virt_addr, uint64_t flags);
 void vmm_load_pagemap(uint64_t *pagemap);
 uint64_t *vmm_get_kernel_pagemap();
+void vmm_flush_tlb(void *addr);

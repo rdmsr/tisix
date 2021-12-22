@@ -60,7 +60,6 @@ void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, 
     Task *new_task = new Task(name, flags, caps);
 
     new_task->start(0);
-
     get_sched()->_ready = false;
 
     Elf64Header *header = nullptr;
@@ -91,13 +90,16 @@ void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, 
 
         memcpy(mem, (void *)arg1, sizeof(Handover));
 
+        host_map_memory(new_task->pagemap, (uint64_t)mem - MMAP_IO_BASE, (uint64_t)mem, 0b111);
+
         new_task->stack.rsi = (uint64_t)mem;
     }
 
     new_task->stack.rdx = arg2;
     new_task->stack.rcx = arg3;
-
     new_task->stack.rip = elf_load_program((uint64_t)header, new_task);
+
+    log("Loaded task {} with rip {#p}", name, new_task->stack.rip);
 
     get_sched()->add_task(new_task);
 }

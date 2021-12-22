@@ -1,4 +1,5 @@
 #include "tisix/maybe.hpp"
+#include "tisix/std.hpp"
 #include <scheduler.hpp>
 #include <tisix/assert.hpp>
 #include <tisix/debug.hpp>
@@ -28,10 +29,13 @@ void Scheduler::construct(size_t m_time_slice)
 
 void Scheduler::add_task(Task *t)
 {
+    lock_acquire(&lock);
+
     tasks.push(t);
 
     if (tasks.size == 1)
         current_task = tasks[0];
+    lock_release(&lock);
 }
 
 Maybe<Task *> Scheduler::tick()
@@ -45,6 +49,7 @@ Maybe<Task *> Scheduler::tick()
 
     if (counter == time_slice && tasks.size > 0)
     {
+
         int prev_index = index;
 
         if (index + 1 < tasks.size)

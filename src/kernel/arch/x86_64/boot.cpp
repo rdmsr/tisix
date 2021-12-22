@@ -11,6 +11,7 @@
 #include <firmware/acpi.hpp>
 #include <pmm.hpp>
 #include <scheduler.hpp>
+#include <syscalls.hpp>
 #include <vmm.hpp>
 
 using namespace tisix;
@@ -24,6 +25,12 @@ void *operator new(size_t count)
 void splash();
 
 extern uint8_t stack[KERNEL_STACK_SIZE];
+
+void idle()
+{
+    while (1)
+        asm_hlt();
+}
 
 void arch_entry_main(Handover *handover)
 {
@@ -54,6 +61,9 @@ void arch_entry_main(Handover *handover)
     asm_sti();
 
     host_alloc_init();
+    syscall_init();
+
+    log("Initialized allocators");
 
     log("usable pages: {} ({} mb)", pmm_get_usable_pages(), (pmm_get_usable_pages() * PAGE_SIZE) / 1024 / 1024);
 

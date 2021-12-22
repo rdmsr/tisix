@@ -47,16 +47,14 @@ include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 ifneq ($(CONFIG_ARCH), 0)
 	include meta/arch/$(CONFIG_ARCH).mk
 	include src/kernel/.build.mk
+	include src/servers/.build.mk
+	SERVERS += $(ECHO_BIN) $(FB_BIN) $(INIT_BIN) $(TIME_BIN)
+	include sysroot/.build.mk
 else
 	include meta/arch/host.mk
 	include src/host/.build.mk
 endif
 
-include src/servers/.build.mk
-
-SERVERS += $(ECHO_BIN) $(FB_BIN) $(INIT_BIN) $(TIME_BIN)
-
-include sysroot/.build.mk
 
 .PHONY = all
 

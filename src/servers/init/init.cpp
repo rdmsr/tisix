@@ -1,4 +1,5 @@
 #include "abi/layer.hpp"
+#include <abi/syscalls.hpp>
 #include <tisix/alloc.hpp>
 #include <tisix/log.hpp>
 
@@ -13,15 +14,8 @@ struct Time
 
 int main(void)
 {
-    // tisix::ipc_send(2, 0, TX_MSG_REQUEST);
-    //
-    // tisix::ipc_on_receive([](TxIpc ipc)
-    //                      {
-    //                        Time *time = (Time *)ipc.msg.data;
-    //
-    //                        log("Got time from pid #{}: {}{}:{}{}:{}{}", ipc.msg.from, time_pad(time->hour), time->hour, time_pad(time->minute), time->minute, time_pad(time->second), time->second);
-    //
-    //                        return true; });
+    log("Welcome to the machine!");
+
     log("Exiting.");
 
     return 0;

@@ -3,7 +3,7 @@ BUILDDIR_HOST= $(BUILDDIR)/host
 HOST = $(BUILDDIR_HOST)/host.elf
 
 HOST_SRC = $(shell find src/host -name '*.cpp') \
-		  $(shell find src/lib/tisix -name '*.cpp')
+		  $(shell find src/lib/tisix -name '*.cpp') 
 
 HOST_OBJ = $(patsubst src/%, $(BUILDDIR_HOST)/%.o, $(HOST_SRC))
 
@@ -17,3 +17,4 @@ $(HOST): $(HOST_OBJ)
 	@$(DIR_GUARD)
 	@$(CROSS_CXX) -o $@ $^
 
+all: $(HOST)

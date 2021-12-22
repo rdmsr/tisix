@@ -58,10 +58,11 @@ extern "C"
         uint64_t res = 0;
 #ifdef __x86_64__
 
-        asm volatile("int $0x42"
-                     : "=a"(res)
-                     : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2), "S"(arg3), "D"(arg4)
-                     : "memory");
+        asm volatile(
+            "syscall\n"
+            : "=a"(res)
+            : "a"(syscall), "b"(arg0), "c"(arg1), "d"(arg2), "S"(arg3), "D"(arg4)
+            : "memory");
 #endif
 
         return res;
