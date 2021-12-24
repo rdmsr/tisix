@@ -1,4 +1,5 @@
 #pragma once
+#include <tisix/handover.hpp>
 #include <tisix/std.hpp>
 
 typedef int TxResult;
@@ -119,6 +120,9 @@ SYSCALL(alloc)
 SYSCALL(free)
 (void *ptr, uint64_t pages);
 
+SYSCALL(get_framebuffer)
+(tisix::HandoverFramebuffer *fb);
+
 #define FOREACH_SYSCALLS(SYSCALL_) \
     SYSCALL_(DEBUG)                \
     SYSCALL_(IPC)                  \
@@ -129,7 +133,8 @@ SYSCALL(free)
     SYSCALL_(ALLOC)                \
     SYSCALL_(FREE)                 \
     SYSCALL_(IN)                   \
-    SYSCALL_(OUT)
+    SYSCALL_(OUT)                  \
+    SYSCALL_(FB)
 
 typedef enum
 {

@@ -23,6 +23,11 @@ extern "C"
         return tx_syscall(TX_SYS_MAP, (uint64_t)map);
     }
 
+    TxResult tx_sys_get_framebuffer(tisix::HandoverFramebuffer *fb)
+    {
+        return tx_syscall(TX_SYS_FB, (uint64_t)fb);
+    }
+
     TxResult tx_sys_exit(uint64_t args)
     {
         return tx_syscall(TX_SYS_EXIT, args);

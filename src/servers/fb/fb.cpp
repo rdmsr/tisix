@@ -12,27 +12,23 @@ using namespace tisix;
 
 int handover_main(Handover *handover)
 {
+    log("Framebuffer is at {#p}", (void *)handover->framebuffer.addr);
 
-    log("Handover is {#p}", (void *)handover);
+    auto fb = handover->framebuffer;
 
-    /* tx_sys_exec("echo", 0);
+    log("Resolution is {}x{}", fb.width, fb.height);
 
-     // Temporary
-     fb.addr = 0x1fe000;
+    gfx::Canvas canvas(fb.addr, fb.width, fb.height);
 
-     log("Resolution is {}x{}", fb.width, fb.height);
+    log("Drawing to the screen...");
 
-     gfx::Canvas canvas(fb.addr, fb.width, fb.height);
-
-     log("Drawing to the screen...");
-
-     for (size_t i = 0; i < fb.width; i++)
-     {
-         for (size_t j = 0; j < fb.height; j++)
-         {
-             canvas.draw_pixel(canvas.color(0, 128, 0), i, j);
-         }
-     }*/
+    for (size_t i = 0; i < fb.width; i++)
+    {
+        for (size_t j = 0; j < fb.height; j++)
+        {
+            canvas.draw_pixel(canvas.color(0, 128, 0), i, j);
+        }
+    }
 
     return 0;
 }

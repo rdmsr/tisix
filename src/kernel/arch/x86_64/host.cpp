@@ -14,9 +14,9 @@ static Alloc stack_alloc = {};
 
 void host_alloc_init()
 {
-    void *buf = (void *)((uint64_t)host_allocate_pages(2) + MMAP_IO_BASE);
+    void *buf = (void *)((uint64_t)host_allocate_pages(4) + MMAP_IO_BASE);
 
-    alloc.construct((uint8_t *)buf, 8192, 256);
+    alloc.construct((uint8_t *)buf, 16384, 256);
 
     void *page_buf = (void *)((uint64_t)host_allocate_pages(10) + MMAP_IO_BASE);
 

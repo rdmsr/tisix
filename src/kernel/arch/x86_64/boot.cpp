@@ -26,12 +26,6 @@ void splash();
 
 extern uint8_t stack[KERNEL_STACK_SIZE];
 
-void idle()
-{
-    while (1)
-        asm_hlt();
-}
-
 void arch_entry_main(Handover *handover)
 {
     com_initialize(COM1);
@@ -83,9 +77,13 @@ void arch_entry_main(Handover *handover)
 
     loader_new_elf_task("echo", TX_TASK_USER);
 
-    loader_new_elf_task("time", TX_TASK_USER, TX_CAP_IO);
+    Handover *new_handover = new Handover();
 
-    loader_new_elf_task("fb", TX_TASK_USER, TX_TASK_NONE, TX_ENTRY_HANDOVER, (long)handover);
+    memcpy(new_handover, handover, sizeof(Handover));
+
+    loader_new_elf_task("fb", TX_TASK_USER, TX_TASK_NONE, TX_ENTRY_HANDOVER, (long)new_handover);
+
+    loader_new_elf_task("time", TX_TASK_USER, TX_CAP_IO);
 
     get_sched()->_ready = true;
 

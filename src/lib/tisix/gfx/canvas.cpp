@@ -15,9 +15,7 @@ void Canvas::draw_pixel(Color color, int x, int y)
     size_t raw_position = x + y * width;
 
     buffer[raw_position] = {
-
         .blue = color.blue,
-
         .green = color.green,
         .red = color.red,
         .__unused = 0};

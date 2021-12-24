@@ -3,6 +3,7 @@ ifneq ($(CONFIG_ARCH), 0)
 	CROSS_LD=$(CONFIG_ARCH)-elf-ld
 
 	CROSS_CXXFLAGS= \
+		-ggdb \
 		$(CXXFLAGS_STD) \
 		$(CXXFLAGS_OPT) \
 		$(CXXFLAGS_WARNS) \

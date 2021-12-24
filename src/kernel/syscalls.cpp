@@ -14,6 +14,7 @@
 #include <tisix/std.hpp>
 
 using namespace tisix;
+
 void syscall_set_gs(uintptr_t addr)
 {
     asm_write_msr(MSR_GS_BASE, addr);
@@ -38,11 +39,10 @@ TxResult sys_debug(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4
     return TX_SUCCESS;
 }
 
-TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t)
 {
     (void)args2;
     (void)args3;
-    (void)args4;
 
     auto unpacked = (TxIpc *)args;
 
@@ -51,12 +51,14 @@ TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
         return TX_INVALID_PARAMS;
     }
 
-    if ((unpacked->flags & TX_IPC_SEND) && unpacked->to != get_sched()->current_task->id)
+    if ((unpacked->flags & TX_IPC_SEND) &&
+        unpacked->to != get_sched()->current_task->id)
     {
         ipc_send(unpacked);
     }
 
-    else if (get_sched()->current_task->id != get_sched()->current_task->ipc_buffer->msg.from)
+    else if (get_sched()->current_task->id !=
+             get_sched()->current_task->ipc_buffer->msg.from)
     {
         ipc_recv(unpacked);
     }
@@ -64,11 +66,10 @@ TxResult sys_ipc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
     return TX_SUCCESS;
 }
 
-TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args3, uint64_t)
 {
     (void)args2;
     (void)args3;
-    (void)args4;
 
     auto unpacked = (TxEvent *)args;
 
@@ -84,7 +85,8 @@ TxResult sys_bind(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
 
 static uint32_t lock = 0;
 
-TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args3,
+                 uint64_t args4)
 {
     (void)args2;
     (void)args3;
@@ -102,7 +104,9 @@ TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
     for (size_t i = 0; i < ALIGN_UP(unpacked->size, 4096) / 4096; i++)
     {
 
-        host_map_memory(get_sched()->current_task->pagemap, i * PAGE_SIZE + unpacked->phys, i * PAGE_SIZE + unpacked->virt, unpacked->flags);
+        host_map_memory(get_sched()->current_task->pagemap,
+                        i * PAGE_SIZE + unpacked->phys,
+                        i * PAGE_SIZE + unpacked->virt, unpacked->flags);
     }
 
     lock_release(&lock);
@@ -110,7 +114,8 @@ TxResult sys_map(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
     return TX_SUCCESS;
 }
 
-TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args3,
+                  uint64_t args4)
 {
     (void)args2;
     (void)args3;
@@ -126,7 +131,8 @@ TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
     return TX_SUCCESS;
 }
 
-TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args3,
+                  uint64_t args4)
 {
 
     (void)args;
@@ -141,7 +147,8 @@ TxResult sys_exec(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
     return TX_SUCCESS;
 }
 
-TxResult sys_alloc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+TxResult sys_alloc(uint64_t args, uint64_t args2, uint64_t args3,
+                   uint64_t args4)
 {
     (void)args3;
     (void)args4;
@@ -153,7 +160,8 @@ TxResult sys_alloc(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4
     return TX_SUCCESS;
 }
 
-TxResult sys_free(uint64_t args, uint64_t args2, uint64_t args3, uint64_t args4)
+TxResult sys_free(uint64_t args, uint64_t args2, uint64_t args3,
+                  uint64_t args4)
 {
     (void)args3;
     (void)args4;
@@ -191,6 +199,21 @@ TxResult sys_out(uint64_t arg1, uint64_t, uint64_t, uint64_t)
     return TX_SUCCESS;
 }
 
+TxResult sys_get_framebuffer(uint64_t arg1, uint64_t, uint64_t, uint64_t)
+{
+
+    if (!(get_sched()->current_task->capabilities & TX_CAP_IO))
+    {
+        return TX_BAD_CAPABILITY;
+    }
+
+    auto unpacked = (HandoverFramebuffer *)arg1;
+
+    host_map_memory(get_sched()->current_task->pagemap, unpacked->addr - MMAP_IO_BASE, unpacked->addr, 0b111);
+
+    return TX_SUCCESS;
+}
+
 typedef TxResult TxSyscallFn(uint64_t a, uint64_t b, uint64_t c, uint64_t d);
 
 static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
@@ -203,7 +226,8 @@ static TxSyscallFn *syscalls[TX_SYS_COUNT] = {
     [TX_SYS_ALLOC] = sys_alloc,
     [TX_SYS_FREE] = sys_free,
     [TX_SYS_IN] = sys_in,
-    [TX_SYS_OUT] = sys_out};
+    [TX_SYS_OUT] = sys_out,
+    [TX_SYS_FB] = sys_get_framebuffer};
 
 extern "C" void syscall_handler(Stack *stack)
 {
@@ -224,7 +248,9 @@ extern "C" void syscall_handle(void);
 void syscall_init(void)
 {
     asm_write_msr(MSR_EFER, asm_read_msr(MSR_EFER) | 1);
-    asm_write_msr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << 32) | ((uint64_t)(((GDT_USER_DATA - 1) * 8) | 3) << 48));
+    asm_write_msr(MSR_STAR,
+                  ((uint64_t)(GDT_KERNEL_CODE * 8) << 32) |
+                      ((uint64_t)(((GDT_USER_DATA - 1) * 8) | 3) << 48));
     asm_write_msr(MSR_LSTAR, (uint64_t)syscall_handle);
     asm_write_msr(MSR_SYSCALL_FLAG_MASK, 0);
 }

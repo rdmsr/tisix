@@ -46,9 +46,10 @@ public:
         return {r, g, b};
     }
 
+    int width = 0, height = 0;
+
 private:
     RawPixel *buffer;
-    int width = 0, height = 0;
 };
 
 } // namespace tisix::gfx

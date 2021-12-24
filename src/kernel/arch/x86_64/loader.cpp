@@ -54,12 +54,28 @@ uint64_t elf_load_program(uint64_t elf_base, Task *task)
     return elf_header->entry;
 }
 
+static uint64_t counter = 2 << 20;
+
+void *allocate_user_page(uint64_t *pagemap)
+{
+    auto addr = host_allocate_pages(1);
+
+    host_map_memory(pagemap, (uint64_t)addr, counter, 0b111);
+
+    auto ret = counter;
+
+    counter += PAGE_SIZE;
+
+    return (void *)ret;
+}
+
 void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, TxEntryType type, long arg1, long arg2, long arg3)
 {
 
     Task *new_task = new Task(name, flags, caps);
 
     new_task->start(0);
+
     get_sched()->_ready = false;
 
     Elf64Header *header = nullptr;
@@ -86,13 +102,27 @@ void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, 
 
     if (type == TX_ENTRY_HANDOVER)
     {
-        auto mem = malloc(sizeof(Handover));
 
-        memcpy(mem, (void *)arg1, sizeof(Handover));
+        handover = (Handover *)arg1;
 
-        host_map_memory(new_task->pagemap, (uint64_t)mem - MMAP_IO_BASE, (uint64_t)mem, 0b111);
+        void *buf = allocate_user_page(new_task->pagemap);
 
-        new_task->stack.rsi = (uint64_t)mem;
+        host_map_memory(new_task->pagemap, (uint64_t)handover - MMAP_IO_BASE, (uint64_t)buf, 0b111);
+
+        uint64_t new_addr = 0;
+
+        for (size_t i = 0; i < ALIGN_UP(handover->framebuffer.height * handover->framebuffer.pitch, PAGE_SIZE) / PAGE_SIZE; i++)
+        {
+            void *fb_buf = allocate_user_page(new_task->pagemap);
+
+            host_map_memory(new_task->pagemap, (uint64_t)handover->framebuffer.addr - MMAP_IO_BASE + i * PAGE_SIZE, (uint64_t)fb_buf, 0b111);
+
+            if (i == 0)
+                new_addr = (uint64_t)fb_buf;
+        }
+
+        handover->framebuffer.addr = new_addr;
+        new_task->stack.rsi = (uint64_t)buf;
     }
 
     new_task->stack.rdx = arg2;
