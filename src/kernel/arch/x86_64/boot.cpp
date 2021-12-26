@@ -12,6 +12,7 @@
 #include <pmm.hpp>
 #include <scheduler.hpp>
 #include <syscalls.hpp>
+#include <tisix/gfx/canvas.hpp>
 #include <vmm.hpp>
 
 using namespace tisix;

@@ -69,6 +69,15 @@ void *allocate_user_page(uint64_t *pagemap)
     return (void *)ret;
 }
 
+uint64_t map_user_page(uint64_t *pagemap, uint64_t phys)
+{
+    host_map_memory(pagemap, phys, counter, 0b111);
+
+    counter += PAGE_SIZE;
+
+    return counter - PAGE_SIZE;
+}
+
 void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, TxEntryType type, long arg1, long arg2, long arg3)
 {
 
@@ -113,15 +122,14 @@ void tisix::loader_new_elf_task(StringView name, uint32_t flags, uint32_t caps, 
 
         for (size_t i = 0; i < ALIGN_UP(handover->framebuffer.height * handover->framebuffer.pitch, PAGE_SIZE) / PAGE_SIZE; i++)
         {
-            void *fb_buf = allocate_user_page(new_task->pagemap);
-
-            host_map_memory(new_task->pagemap, (uint64_t)handover->framebuffer.addr - MMAP_IO_BASE + i * PAGE_SIZE, (uint64_t)fb_buf, 0b111);
+            uint64_t fb_base = map_user_page(new_task->pagemap, (uint64_t)handover->framebuffer.addr - MMAP_IO_BASE + i * PAGE_SIZE);
 
             if (i == 0)
-                new_addr = (uint64_t)fb_buf;
+                new_addr = (uint64_t)fb_base;
         }
 
         handover->framebuffer.addr = new_addr;
+
         new_task->stack.rsi = (uint64_t)buf;
     }
 

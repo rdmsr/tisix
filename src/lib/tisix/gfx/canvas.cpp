@@ -1,4 +1,5 @@
 #include <tisix/gfx/canvas.hpp>
+#include <tisix/log.hpp>
 
 namespace tisix::gfx
 {

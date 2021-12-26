@@ -69,6 +69,15 @@ struct stivale2_header_tag_framebuffer
 
 #define STIVALE2_HEADER_TAG_FB_MTRR_ID 0x4c7bb07731282e00
 
+#define STIVALE2_HEADER_TAG_SLIDE_HHDM_ID 0xdc29269c2af53d1d
+
+struct stivale2_header_tag_slide_hhdm
+{
+    struct stivale2_tag tag;
+    uint64_t flags;
+    _stivale2_split64(alignment);
+};
+
 #define STIVALE2_HEADER_TAG_TERMINAL_ID 0xa85d499b1823be72
 
 struct stivale2_header_tag_terminal
@@ -80,6 +89,17 @@ struct stivale2_header_tag_terminal
 
 #define STIVALE2_TERM_CB_DEC 10
 #define STIVALE2_TERM_CB_BELL 20
+#define STIVALE2_TERM_CB_PRIVATE_ID 30
+#define STIVALE2_TERM_CB_STATUS_REPORT 40
+#define STIVALE2_TERM_CB_POS_REPORT 50
+#define STIVALE2_TERM_CB_KBD_LEDS 60
+#define STIVALE2_TERM_CB_MODE 70
+#define STIVALE2_TERM_CB_LINUX 80
+
+#define STIVALE2_TERM_CTX_SIZE ((uint64_t)(-1))
+#define STIVALE2_TERM_CTX_SAVE ((uint64_t)(-2))
+#define STIVALE2_TERM_CTX_RESTORE ((uint64_t)(-3))
+#define STIVALE2_TERM_FULL_REFRESH ((uint64_t)(-4))
 
 #define STIVALE2_HEADER_TAG_SMP_ID 0x1ab015085f3273df
 
@@ -125,6 +145,15 @@ struct stivale2_struct_tag_pmrs
     struct stivale2_tag tag;
     uint64_t entries;
     struct stivale2_pmr pmrs[];
+};
+
+#define STIVALE2_STRUCT_TAG_KERNEL_BASE_ADDRESS_ID 0x060d78874a2a8af0
+
+struct stivale2_struct_tag_kernel_base_address
+{
+    struct stivale2_tag tag;
+    uint64_t physical_base_address;
+    uint64_t virtual_base_address;
 };
 
 #define STIVALE2_STRUCT_TAG_CMDLINE_ID 0xe5e76a1b4597a781
@@ -287,6 +316,24 @@ struct stivale2_struct_tag_kernel_file_v2
     uint64_t kernel_size;
 };
 
+#define STIVALE2_STRUCT_TAG_BOOT_VOLUME_ID 0x9b4358364c19ee62
+
+struct stivale2_guid
+{
+    uint32_t a;
+    uint16_t b;
+    uint16_t c;
+    uint8_t d[8];
+};
+
+struct stivale2_struct_tag_boot_volume
+{
+    struct stivale2_tag tag;
+    uint64_t flags;
+    struct stivale2_guid guid;
+    struct stivale2_guid part_guid;
+};
+
 #define STIVALE2_STRUCT_TAG_KERNEL_SLIDE_ID 0xee80847d01506c57
 
 struct stivale2_struct_tag_kernel_slide
@@ -351,9 +398,9 @@ struct stivale2_struct_tag_dtb
     uint64_t size;
 };
 
-#define STIVALE2_STRUCT_TAG_VMAP 0xb0ed257db18cb58f
+#define STIVALE2_STRUCT_TAG_HHDM_ID 0xb0ed257db18cb58f
 
-struct stivale2_struct_vmap
+struct stivale2_struct_tag_hhdm
 {
     struct stivale2_tag tag;
     uint64_t addr;

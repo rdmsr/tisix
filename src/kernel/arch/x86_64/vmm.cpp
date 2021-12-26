@@ -19,16 +19,6 @@ void vmm_initialize(Handover *handover)
     vmm_map_range(kernel_pagemap, 0, 0x8000000, MMAP_KERNEL_BASE, 0b11);
     vmm_map_range(kernel_pagemap, 0, 0x100000000, MMAP_IO_BASE, 0b11);
 
-    /*    for (auto e : handover->mmap)
-        {
-            if (e.type == HANDOVER_MMAP_FREE)
-            {
-                for (size_t p = 0; p < e.size; p += PAGE_SIZE)
-                    vmm_map_page(kernel_pagemap, p, p + MMAP_IO_BASE, 0b11);
-            }
-        }
-        */
-
     vmm_load_pagemap(kernel_pagemap);
 
     log("initialized vmm");
