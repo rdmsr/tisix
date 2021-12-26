@@ -75,7 +75,6 @@ void arch_entry_main(Handover *handover)
     loader_init(handover);
 
     loader_new_elf_task("init", TX_TASK_USER);
-
     loader_new_elf_task("echo", TX_TASK_USER);
 
     Handover *new_handover = new Handover();
@@ -83,8 +82,6 @@ void arch_entry_main(Handover *handover)
     memcpy(new_handover, handover, sizeof(Handover));
 
     loader_new_elf_task("fb", TX_TASK_USER, TX_TASK_NONE, TX_ENTRY_HANDOVER, (long)new_handover);
-
-    loader_new_elf_task("time", TX_TASK_USER, TX_CAP_IO);
 
     get_sched()->_ready = true;
 

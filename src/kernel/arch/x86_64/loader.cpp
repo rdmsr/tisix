@@ -19,7 +19,7 @@ Scheduler *tisix::get_sched() { return scheduler; }
 void tisix::loader_init(tisix::Handover *_handover)
 {
 
-    scheduler = new Scheduler(20);
+    scheduler = new Scheduler(10);
     handover = new Handover;
 
     memcpy(handover, _handover, sizeof(Handover));
@@ -54,7 +54,7 @@ uint64_t elf_load_program(uint64_t elf_base, Task *task)
     return elf_header->entry;
 }
 
-static uint64_t counter = 2 << 20;
+static uint64_t counter = 2 << 19;
 
 void *allocate_user_page(uint64_t *pagemap)
 {

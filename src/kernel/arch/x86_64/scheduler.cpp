@@ -42,37 +42,28 @@ Maybe<Task *> Scheduler::tick()
 {
     lock_acquire(&lock);
 
-    counter++;
-
-    if (counter > time_slice)
-        counter = 0;
-
-    if (counter == time_slice && tasks.size > 0)
+    if (counter++ == time_slice)
     {
-
-        int prev_index = index;
-
-        if (index + 1 < tasks.size)
-        {
-            index++;
-        }
-
-        // if we're at the end of the list, rewind
-        else if (index + 1 == tasks.size)
-        {
-            index = 0;
-        }
-
         counter = 0;
 
-        lock_release(&lock);
-
-        if (tasks[prev_index]->running)
-            return Just(tasks[prev_index]);
-
-        return Nothing;
+        if (tasks[index])
+        {
+            while (tasks[index]->running == false)
+            {
+                if (index + 1 == tasks.size)
+                    index = 0;
+                else
+                    index++;
+            }
+        }
     }
 
     lock_release(&lock);
-    return Nothing;
+
+    if (tasks[index])
+    {
+        return Just(tasks[index]);
+    }
+    else
+        return Nothing;
 }

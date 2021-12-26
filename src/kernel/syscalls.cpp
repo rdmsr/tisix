@@ -128,6 +128,7 @@ TxResult sys_exit(uint64_t args, uint64_t args2, uint64_t args3,
     {
         asm_sti();
     }
+
     return TX_SUCCESS;
 }
 

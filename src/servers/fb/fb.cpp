@@ -22,12 +22,9 @@ int handover_main(Handover *handover)
 
     log("Drawing to the screen...");
 
-    for (size_t i = 0; i < fb.width; i++)
+    for (size_t j = 0; j < fb.height; j++)
     {
-        for (size_t j = 0; j < fb.height; j++)
-        {
-            canvas.draw_pixel(canvas.color(0, 128, 0), i, j);
-        }
+        canvas.draw_pixel(canvas.color(0xFFFFFF), 0, j);
     }
 
     return 0;

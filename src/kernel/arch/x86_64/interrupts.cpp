@@ -116,7 +116,9 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
             if (tisix::get_sched()->ready())
             {
                 if (prev_task)
+                {
                     prev_task->stack = *stackframe;
+                }
 
                 auto result = tisix::get_sched()->tick();
 
@@ -146,15 +148,7 @@ extern "C" uint64_t interrupts_handler(uint64_t rsp)
         }
     }
 
-    else if (stackframe->intno == 0x42)
-    {
-        syscall_dispatch(stackframe, (TxSyscall)stackframe->rax, stackframe->rbx);
-    }
-
-    if (stackframe->intno != 0x42)
-    {
-        apic_eoi();
-    }
+    apic_eoi();
 
     return rsp;
 }
